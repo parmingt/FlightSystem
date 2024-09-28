@@ -1,0 +1,35 @@
+﻿@page "/airports"
+@using FlightSystem.Data
+@using Microsoft.EntityFrameworkCore
+@rendermode InteractiveServer
+@implements IDisposable
+@inject IDbContextFactory<FlightContext> DbFactory
+
+<h3>Airports</h3>
+
+<table>
+    <tr>
+        <th>Name</th>
+        <th>Code</th>
+    </tr>
+    @foreach (var item in airports)
+    {
+        <tr>
+            <td>@item.Name</td>
+            <td>@item.Code</td>
+        </tr>
+    }
+</table>
+
+@code {
+    private List<Airport> airports = new();
+    protected async override Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        airports = await context.Airports.ToListAsync();
+    }
+
+    public void Dispose()
+    {
+    }
+}
