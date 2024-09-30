@@ -11,7 +11,8 @@
                       DataProvider="AirportsDataProvider"
                       PropertyName="Name"
                       Placeholder="Search an airport..."
-                      OnChanged="(Airport airport) => OnOriginChanged(airport)" />
+                      OnChanged="(Airport airport) => OnOriginChanged(airport)"
+                      Disabled="origin is not NoAirportSelected"/>
     </div>
 </div>
 
@@ -22,7 +23,8 @@
                       DataProvider="AirportsDataProvider"
                       PropertyName="Name"
                       Placeholder="Search an airport..."
-                      OnChanged="(Airport airport) => OnDestinationChanged(airport)" />
+                      OnChanged="(Airport airport) => OnDestinationChanged(airport)"
+                      Disabled="destination is not NoAirportSelected" />
     </div>
 </div>
 
