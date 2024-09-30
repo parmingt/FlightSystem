@@ -1,0 +1,44 @@
+﻿@page "/book-flight"
+@using FlightSystem.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<FlightContext> DbFactory
+
+<h3>BookFlight</h3>
+
+<div class="row">
+    <div class="col-md-5 col-sm-12">
+        <AutoComplete @bind-Value="originCode"
+                      TItem="Airport"
+                      DataProvider="AirportsDataProvider"
+                      PropertyName="Name"
+                      Placeholder="Search an airport..."
+                      OnChanged="(Airport airport) => OnAutoCompleteChanged(airport)" />
+    </div>
+</div>
+
+@code {
+
+    private string originCode;
+
+    protected async override Task OnInitializedAsync()
+    {
+        // using var context = DbFactory.CreateDbContext();
+        // airports = await context.Airports.ToListAsync();
+    }
+
+    private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
+    {
+        using var context = DbFactory.CreateDbContext();
+        var airports = await context.Airports.ToListAsync();
+
+        return await Task.FromResult(request.ApplyTo(airports.OrderBy(airport => airport.Name)));
+    }
+
+    private void OnAutoCompleteChanged(Airport airport)
+    {
+        // TODO: handle your own logic
+
+        // NOTE: do null check
+        Console.WriteLine($"'{airport.Name}' selected.");
+    }
+}

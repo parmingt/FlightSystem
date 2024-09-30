@@ -3,6 +3,7 @@ using FlightSystem.UI.Components;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddBlazorBootstrap();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
