@@ -28,8 +28,8 @@
 
 @code {
 
-    private Airport origin = new("", "");
-    private Airport destination = new("", "");
+    private Airport origin = new NoAirportSelected();
+    private Airport destination = new NoAirportSelected();
 
     private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
     {
@@ -50,5 +50,12 @@
     private void OnDestinationChanged(Airport airport)
     {
         destination = airport;
+    }
+
+    protected class NoAirportSelected : Airport {
+        public NoAirportSelected() : base("", "")
+        {
+            
+        }
     }
 }

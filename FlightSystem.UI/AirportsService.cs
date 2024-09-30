@@ -17,19 +17,7 @@ public class AirportsService
     {
         var data = context.Airports.Where(a =>
             EF.Functions.Like(a.Code, $"%{query}%") || EF.Functions.Like(a.Name, $"%{query}%"));
-        return await data.Select(a => new Airport(a.Code, a.Name))
-        .ToListAsync();
+        return await data.Select(a => new Airport(a.Code, a.Name)).ToListAsync();
     }
 
-}
-
-public class Airport
-{
-    public Airport(string code, string name)
-    {
-        this.Code = code;
-        this.Name = name;
-    }
-    public string Code { get; set; }
-    public string Name { get; set; }
 }
