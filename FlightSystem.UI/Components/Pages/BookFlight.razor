@@ -1,44 +1,54 @@
 ﻿@page "/book-flight"
-@using FlightSystem.Data
-@using Microsoft.EntityFrameworkCore
-@inject IDbContextFactory<FlightContext> DbFactory
+@using FlightSystem.UI
+@inject AirportsService airportsService
 
 <h3>BookFlight</h3>
 
 <div class="row">
     <div class="col-md-5 col-sm-12">
-        <AutoComplete @bind-Value="originCode"
+        <AutoComplete @bind-Value="origin.Name"
                       TItem="Airport"
                       DataProvider="AirportsDataProvider"
                       PropertyName="Name"
                       Placeholder="Search an airport..."
-                      OnChanged="(Airport airport) => OnAutoCompleteChanged(airport)" />
+                      OnChanged="(Airport airport) => OnOriginChanged(airport)" />
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-5 col-sm-12">
+        <AutoComplete @bind-Value="destination.Name"
+                      TItem="Airport"
+                      DataProvider="AirportsDataProvider"
+                      PropertyName="Name"
+                      Placeholder="Search an airport..."
+                      OnChanged="(Airport airport) => OnDestinationChanged(airport)" />
     </div>
 </div>
 
 @code {
 
-    private string originCode;
-
-    protected async override Task OnInitializedAsync()
-    {
-        // using var context = DbFactory.CreateDbContext();
-        // airports = await context.Airports.ToListAsync();
-    }
+    private Airport origin = new("", "");
+    private Airport destination = new("", "");
 
     private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
     {
-        using var context = DbFactory.CreateDbContext();
-        var airports = await context.Airports.ToListAsync();
+        var airports = await airportsService.SearchAirportsAsync(request.Filter.Value);
 
-        return await Task.FromResult(request.ApplyTo(airports.OrderBy(airport => airport.Name)));
+        return await Task.FromResult(new AutoCompleteDataProviderResult<Airport>
+        {
+            Data = airports,
+            TotalCount = airports.Count
+        });
     }
 
-    private void OnAutoCompleteChanged(Airport airport)
+    private void OnOriginChanged(Airport airport)
     {
-        // TODO: handle your own logic
+        origin = airport;
+    }
 
-        // NOTE: do null check
-        Console.WriteLine($"'{airport.Name}' selected.");
+    private void OnDestinationChanged(Airport airport)
+    {
+        destination = airport;
     }
 }

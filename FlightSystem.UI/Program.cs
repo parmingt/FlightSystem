@@ -1,4 +1,5 @@
 using FlightSystem.Data;
+using FlightSystem.UI;
 using FlightSystem.UI.Components;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,6 +12,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddDbContextFactory<FlightContext>(options =>
     options.UseSqlite(builder.Configuration["ConnectionStrings:SQLiteDefault"]), ServiceLifetime.Singleton);
+
+builder.Services.AddScoped<AirportsService>();
 
 var app = builder.Build();
 
