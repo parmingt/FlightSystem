@@ -12,11 +12,6 @@ public class FlightContext : DbContext
     public FlightContext(DbContextOptions<FlightContext> options)
     : base(options)
     { }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseSqlite("Data Source=localflights.dat");
-    }
 }
 
 public class Flight
