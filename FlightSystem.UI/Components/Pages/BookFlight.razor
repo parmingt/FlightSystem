@@ -33,12 +33,33 @@
     @onclick="() => SearchFlights()"
     Disabled="selectedOrigin is NoAirportSelected || selectedDestination is NoAirportSelected">Search Flights</Button>
 
+<Grid 
+      TItem="Flight"
+      Class="table table-hover table-bordered table-striped"
+      Data ="matchingFlights"
+      AllowFiltering="true"
+      Responsive="true">
+
+    <GridColumns>
+        <GridColumn TItem="Flight" HeaderText="Origin">
+            @context.Origin.Name
+        </GridColumn>
+        <GridColumn TItem="Flight" HeaderText="Destination">
+            @context.Destination.Name
+        </GridColumn>
+        <GridColumn TItem="Flight" HeaderText="Date">
+            @context.Date
+        </GridColumn>
+    </GridColumns>
+
+</Grid>
+
 @code {
     private string originSearchText = "";
     private string destinationSearchText = "";
     private Airport selectedOrigin = new NoAirportSelected();
     private Airport selectedDestination = new NoAirportSelected();
-    private DateOnly travelDate;
+    private DateOnly travelDate = DateOnly.FromDateTime(DateTime.Now);
     private List<Flight> matchingFlights = new();
 
     private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
@@ -54,11 +75,15 @@
 
     private void OnOriginChanged(Airport airport)
     {
+        if (airport is null)
+            matchingFlights = new();
         selectedOrigin = airport ?? new NoAirportSelected();
     }
 
     private void OnDestinationChanged(Airport airport)
     {
+        if (airport is null)
+            matchingFlights = new();
         selectedDestination = airport ?? new NoAirportSelected();
     }
 
