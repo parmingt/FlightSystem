@@ -3,6 +3,7 @@ using System;
 using FlightSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,16 +11,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightSystem.Data.Migrations
 {
     [DbContext(typeof(FlightContext))]
-    partial class FlightContextModelSnapshot : ModelSnapshot
+    [Migration("20241001154716_seed data")]
+    partial class seeddata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
             modelBuilder.Entity("FlightSystem.Data.Airport", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -41,33 +44,15 @@ namespace FlightSystem.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c71f5d8d-0cb5-4543-a311-1634e9e7bfc6"),
+                            Id = new Guid("32be2570-3881-4be5-a074-9b295fd599e3"),
                             Code = "ATL",
                             Name = "Atlanta"
-                        },
-                        new
-                        {
-                            Id = new Guid("5654f336-9fab-4c97-be51-b6a14a51dcda"),
-                            Code = "EWR",
-                            Name = "Newark"
-                        },
-                        new
-                        {
-                            Id = new Guid("c4ac12df-ae7b-4b9e-99dc-79d3ec0fb6cf"),
-                            Code = "SLC",
-                            Name = "Salt Lake City"
-                        },
-                        new
-                        {
-                            Id = new Guid("a22f127a-05bb-4c62-9cdd-98b6470a536b"),
-                            Code = "PHI",
-                            Name = "Philadelphia"
                         });
                 });
 
             modelBuilder.Entity("FlightSystem.Data.Flight", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -90,16 +75,6 @@ namespace FlightSystem.Data.Migrations
                     b.HasIndex("OriginId");
 
                     b.ToTable("Flights");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("f6ca3782-ecfd-4417-b588-b1d988faf97b"),
-                            Departure = new DateTime(2024, 10, 1, 13, 7, 18, 418, DateTimeKind.Local).AddTicks(2861),
-                            DestinationId = new Guid("c71f5d8d-0cb5-4543-a311-1634e9e7bfc6"),
-                            Duration = new TimeSpan(0, 3, 0, 0, 0),
-                            OriginId = new Guid("5654f336-9fab-4c97-be51-b6a14a51dcda")
-                        });
                 });
 
             modelBuilder.Entity("FlightSystem.Data.Flight", b =>

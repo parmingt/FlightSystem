@@ -3,6 +3,7 @@ using System;
 using FlightSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,16 +11,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightSystem.Data.Migrations
 {
     [DbContext(typeof(FlightContext))]
-    partial class FlightContextModelSnapshot : ModelSnapshot
+    [Migration("20241001155747_more seed data")]
+    partial class moreseeddata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
 
             modelBuilder.Entity("FlightSystem.Data.Airport", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -67,7 +70,7 @@ namespace FlightSystem.Data.Migrations
 
             modelBuilder.Entity("FlightSystem.Data.Flight", b =>
                 {
-                    b.Property<Guid?>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
@@ -95,7 +98,7 @@ namespace FlightSystem.Data.Migrations
                         new
                         {
                             Id = new Guid("f6ca3782-ecfd-4417-b588-b1d988faf97b"),
-                            Departure = new DateTime(2024, 10, 1, 13, 7, 18, 418, DateTimeKind.Local).AddTicks(2861),
+                            Departure = new DateTime(2024, 10, 1, 11, 57, 47, 634, DateTimeKind.Local).AddTicks(7434),
                             DestinationId = new Guid("c71f5d8d-0cb5-4543-a311-1634e9e7bfc6"),
                             Duration = new TimeSpan(0, 3, 0, 0, 0),
                             OriginId = new Guid("5654f336-9fab-4c97-be51-b6a14a51dcda")
