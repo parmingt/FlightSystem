@@ -1,37 +1,45 @@
 ﻿@page "/book-flight"
 @using FlightSystem.UI
 @inject AirportsService airportsService
+@inject FlightSearchService flightSearchService
 
 <h3>BookFlight</h3>
 
 <div class="row">
     <div class="col-md-5 col-sm-12">
-        <AutoComplete @bind-Value="origin.Name"
+        <AutoComplete @bind-Value="originSearchText"
                       TItem="Airport"
                       DataProvider="AirportsDataProvider"
                       PropertyName="Name"
                       Placeholder="Search an airport..."
-                      OnChanged="(Airport airport) => OnOriginChanged(airport)"
-                      Disabled="origin is not NoAirportSelected"/>
+                      OnChanged="(Airport airport) => OnOriginChanged(airport)"/>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-5 col-sm-12">
-        <AutoComplete @bind-Value="destination.Name"
+        <AutoComplete @bind-Value="destinationSearchText"
                       TItem="Airport"
                       DataProvider="AirportsDataProvider"
                       PropertyName="Name"
                       Placeholder="Search an airport..."
-                      OnChanged="(Airport airport) => OnDestinationChanged(airport)"
-                      Disabled="destination is not NoAirportSelected" />
+                      OnChanged="(Airport airport) => OnDestinationChanged(airport)" />
     </div>
 </div>
+<div class="mb-3">
+    <DateInput TValue="DateOnly" @bind-Value="@travelDate" Placeholder="Enter Date" />
+</div>
+<Button Color="ButtonColor.Primary" 
+    @onclick="() => SearchFlights()"
+    Disabled="selectedOrigin is NoAirportSelected || selectedDestination is NoAirportSelected">Search Flights</Button>
 
 @code {
-
-    private Airport origin = new NoAirportSelected();
-    private Airport destination = new NoAirportSelected();
+    private string originSearchText = "";
+    private string destinationSearchText = "";
+    private Airport selectedOrigin = new NoAirportSelected();
+    private Airport selectedDestination = new NoAirportSelected();
+    private DateOnly travelDate;
+    private List<Flight> matchingFlights = new();
 
     private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
     {
@@ -46,15 +54,26 @@
 
     private void OnOriginChanged(Airport airport)
     {
-        origin = airport;
+        selectedOrigin = airport ?? new NoAirportSelected();
     }
 
     private void OnDestinationChanged(Airport airport)
     {
-        destination = airport;
+        selectedDestination = airport ?? new NoAirportSelected();
     }
 
-    protected class NoAirportSelected : Airport {
+    private async Task SearchFlights()
+    {
+        if (selectedOrigin is NoAirportSelected || selectedDestination is NoAirportSelected)
+        {
+            Console.WriteLine("No airport selected");
+            return;
+        }
+        var flights = await flightSearchService.SearchFlightsAsync(selectedOrigin, selectedDestination, travelDate);
+        matchingFlights = flights;
+    }
+
+    protected record NoAirportSelected : Airport {
         public NoAirportSelected() : base("", "")
         {
             

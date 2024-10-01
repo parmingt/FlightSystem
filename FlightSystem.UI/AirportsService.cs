@@ -11,6 +11,12 @@ public class AirportsService
     public AirportsService(FlightContext context)
     {
         this.context = context;
+        var phi = context.Airports.Where(a => a.Code == "PHI");
+        if (!phi.Any())
+        {
+            context.Airports.Add(new Data.Airport() { Code = "PHI", Name = "Philadelphia" });
+            context.SaveChanges();
+        }
     }
 
     public async Task<List<Airport>> SearchAirportsAsync(string query)

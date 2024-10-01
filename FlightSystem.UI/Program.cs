@@ -14,6 +14,7 @@ builder.Services.AddDbContextFactory<FlightContext>(options =>
     options.UseSqlite(builder.Configuration["ConnectionStrings:SQLiteDefault"]), ServiceLifetime.Singleton);
 
 builder.Services.AddScoped<AirportsService>();
+builder.Services.AddScoped<FlightSearchService>();
 
 var app = builder.Build();
 

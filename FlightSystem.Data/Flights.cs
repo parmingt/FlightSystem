@@ -17,17 +17,18 @@ public class FlightContext : DbContext
 public class Flight
 {
     public Guid Id { get; set; }
-    public Airport Origin { get; set; }
-    public Airport Destination { get; set; }
+    public required Airport Origin { get; set; }
+    public required Airport Destination { get; set; }
     public DateTime Departure { get; set; }
     public TimeSpan Duration { get; set; }
 
 
 }
 
+[Index(nameof(Code), IsUnique = true)]
 public class Airport
 {
     public Guid Id { get; set; }
-    public string Code { get; set; }
-    public string Name { get; set; }
+    public required string Code { get; set; }
+    public required string Name { get; set; }
 }
