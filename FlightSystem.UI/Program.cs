@@ -2,6 +2,8 @@ using FlightSystem.Data;
 using FlightSystem.UI;
 using FlightSystem.UI.Components;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBlazorBootstrap();
@@ -15,6 +17,12 @@ builder.Services.AddDbContextFactory<FlightContext>(options =>
 
 builder.Services.AddScoped<AirportsService>();
 builder.Services.AddScoped<FlightSearchService>();
+
+builder.Services.AddHttpClient<AviationEdgeClient>((serviceProvider, client) =>
+{
+    client.BaseAddress = new Uri("https://aviation-edge.com/v2/public/");
+});
+
 
 var app = builder.Build();
 

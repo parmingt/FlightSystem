@@ -1,4 +1,5 @@
 ﻿using FlightSystem.Data;
+using FlightSystem.Services.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Runtime.InteropServices;
 
@@ -13,11 +14,11 @@ public class AirportsService
         this.context = context;
     }
 
-    public async Task<List<Airport>> SearchAirportsAsync(string query)
+    public async Task<List<Services.Models.Airport>> SearchAirportsAsync(string query)
     {
         var data = context.Airports.Where(a =>
             EF.Functions.Like(a.Code, $"%{query}%") || EF.Functions.Like(a.Name, $"%{query}%"));
-        return await data.Select(a => new Airport(a.Code, a.Name)).ToListAsync();
+        return await data.Select(a => new Services.Models.Airport(a.Code, a.Name)).ToListAsync();
     }
 
 }
