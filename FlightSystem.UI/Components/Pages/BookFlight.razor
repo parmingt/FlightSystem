@@ -42,13 +42,13 @@
       Responsive="true">
 
     <GridColumns>
-        <GridColumn TItem="Flight" HeaderText="Origin">
+        <GridColumn TItem="Flight" HeaderText="Origin" SortKeySelector="item => item.Origin.Name">
             @context.Origin.Name
         </GridColumn>
-        <GridColumn TItem="Flight" HeaderText="Destination">
+        <GridColumn TItem="Flight" HeaderText="Destination" SortKeySelector="item => item.Destination.Name">
             @context.Destination.Name
         </GridColumn>
-        <GridColumn TItem="Flight" HeaderText="Date">
+        <GridColumn TItem="Flight" HeaderText="Date" SortKeySelector="item => item.Date">
             @context.Date
         </GridColumn>
     </GridColumns>
@@ -96,7 +96,7 @@
             return;
         }
         var flights = await flightSearchService.SearchFlightsAsync(selectedOrigin, selectedDestination, travelDate);
-        matchingFlights = flights;
+        matchingFlights = flights.Distinct().ToList();
     }
 
     protected record NoAirportSelected : Airport {

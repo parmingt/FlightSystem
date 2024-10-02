@@ -1,4 +1,5 @@
 using FlightSystem.Data;
+using FlightSystem.Services;
 using FlightSystem.UI;
 using FlightSystem.UI.Components;
 using Microsoft.EntityFrameworkCore;
@@ -22,6 +23,15 @@ builder.Services.AddHttpClient<AviationEdgeClient>((serviceProvider, client) =>
 {
     client.BaseAddress = new Uri("https://aviation-edge.com/v2/public/");
 });
+
+builder.Services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
+{
+    var token = builder.Configuration["amadeusToken"];
+    client.BaseAddress = new Uri("https://test.api.amadeus.com/v2/");
+    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+});
+builder.Services.AddTransient<IRoutesClient, AmadeusClient>();
+
 
 
 var app = builder.Build();

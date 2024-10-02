@@ -1,4 +1,5 @@
-﻿using FlightSystem.Services.Models;
+﻿using FlightSystem.Services;
+using FlightSystem.Services.Models;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Services;
 
-public class AviationEdgeClient : IRoutesClient
+public class AviationEdgeClient
 {
     private readonly string apiKey;
     private readonly HttpClient httpClient;
@@ -29,7 +30,7 @@ public class AviationEdgeClient : IRoutesClient
         var json = await response.Content.ReadAsStringAsync();
         var responseRoutes = JsonSerializer.Deserialize<List<RoutesResponse>>(json);
         return responseRoutes
-            .Select(r => new Flight(DateTime.Parse(r.departureTime), origin, destination))
+            .Select(r => new Flight(DateTime.Parse(r.departureTime), origin, destination, 0m))
             .ToList();
     }
 

@@ -1,4 +1,5 @@
 ﻿using FlightSystem.Data;
+using FlightSystem.Services;
 using FlightSystem.Services.Models;
 using Microsoft.EntityFrameworkCore;
 using Services;
@@ -8,17 +9,17 @@ namespace FlightSystem.UI;
 public class FlightSearchService
 {
     private readonly FlightContext context;
-    private readonly AviationEdgeClient aviationEdgeClient;
+    private readonly AmadeusClient amadeusClient;
 
-    public FlightSearchService(FlightContext context, AviationEdgeClient aviationEdgeClient)
+    public FlightSearchService(FlightContext context, AmadeusClient amadeusClient)
     {
         this.context = context;
-        this.aviationEdgeClient = aviationEdgeClient;
+        this.amadeusClient = amadeusClient;
     }
 
     public async Task<List<Services.Models.Flight>> SearchFlightsAsync(Services.Models.Airport origin, Services.Models.Airport destination, DateOnly travelDate)
     {
-        var routes = await aviationEdgeClient.GetRoutesAsync(origin, destination);
+        var routes = await amadeusClient.SearchFlights(origin, destination, travelDate.ToDateTime(TimeOnly.MinValue));
         return routes;
         //var flights = await context.Flights.Where(f =>
         //        f.Origin.Code == origin.Code

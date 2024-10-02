@@ -1,4 +1,4 @@
-﻿namespace Services
+﻿namespace FlightSystem.Services
 {
     public interface IRoutesClient
     {
