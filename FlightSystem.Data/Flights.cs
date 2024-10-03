@@ -23,7 +23,7 @@ public class FlightContext : DbContext
             atlanta,
             newark,
             new { Id = new Guid("C4AC12DF-AE7B-4B9E-99DC-79D3EC0FB6CF"), Code = "SLC", Name = "Salt Lake City" },
-            new { Id = new Guid("A22F127A-05BB-4C62-9CDD-98B6470A536B"), Code = "PHI", Name = "Philadelphia" });
+            new { Id = new Guid("A22F127A-05BB-4C62-9CDD-98B6470A536B"), Code = "PHL", Name = "Philadelphia" });
 
         modelBuilder.Entity<Flight>().HasData(
             new {
