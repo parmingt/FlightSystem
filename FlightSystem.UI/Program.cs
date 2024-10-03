@@ -3,8 +3,6 @@ using FlightSystem.Services;
 using FlightSystem.UI;
 using FlightSystem.UI.Components;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBlazorBootstrap();
@@ -19,18 +17,12 @@ builder.Services.AddDbContextFactory<FlightContext>(options =>
 builder.Services.AddScoped<AirportsService>();
 builder.Services.AddScoped<FlightSearchService>();
 
-builder.Services.AddHttpClient<AviationEdgeClient>((serviceProvider, client) =>
-{
-    client.BaseAddress = new Uri("https://aviation-edge.com/v2/public/");
-});
-
-builder.Services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
+builder.Services.AddHttpClient<IRoutesClient, AmadeusClient>((serviceProvider, client) =>
 {
     var token = builder.Configuration["amadeusToken"];
     client.BaseAddress = new Uri("https://test.api.amadeus.com/v2/");
     client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 });
-builder.Services.AddTransient<IRoutesClient, AmadeusClient>();
 
 
 

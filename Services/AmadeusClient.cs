@@ -17,10 +17,10 @@ public class AmadeusClient : IRoutesClient
     {
         this.httpClient = httpClient;
     }
-    public async Task<List<Flight>> SearchFlights(Airport origin, Airport destination, DateTime departure, int numAdults = 1)
+    public async Task<List<Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateTime departure, int numAdults = 1)
     {
         var formattedDate = departure.ToString("yyyy-MM-dd");
-        var endpoint = $"shopping/flight-offers?originLocationCode={origin.Code}&destinationLocationCode={destination.Code}&departureDate={formattedDate}&adults={numAdults}";
+        var endpoint = $"shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
         var response = await httpClient.GetAsync(endpoint);
         var json = await response.Content.ReadAsStringAsync();
         var offers = JsonSerializer.Deserialize<FlightOffersResponse>(json);

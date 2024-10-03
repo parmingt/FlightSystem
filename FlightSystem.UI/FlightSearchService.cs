@@ -1,25 +1,23 @@
 ﻿using FlightSystem.Data;
 using FlightSystem.Services;
 using FlightSystem.Services.Models;
-using Microsoft.EntityFrameworkCore;
-using Services;
 
 namespace FlightSystem.UI;
 
 public class FlightSearchService
 {
     private readonly FlightContext context;
-    private readonly AmadeusClient amadeusClient;
+    private readonly IRoutesClient routesClient;
 
-    public FlightSearchService(FlightContext context, AmadeusClient amadeusClient)
+    public FlightSearchService(FlightContext context, IRoutesClient routesClient)
     {
         this.context = context;
-        this.amadeusClient = amadeusClient;
+        this.routesClient = routesClient;
     }
 
-    public async Task<List<Services.Models.Flight>> SearchFlightsAsync(Services.Models.Airport origin, Services.Models.Airport destination, DateOnly travelDate)
+    public async Task<List<Services.Models.Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateOnly travelDate)
     {
-        var routes = await amadeusClient.SearchFlights(origin, destination, travelDate.ToDateTime(TimeOnly.MinValue));
+        var routes = await routesClient.SearchFlightsAsync(origin, destination, travelDate.ToDateTime(TimeOnly.MinValue));
         return routes;
         //var flights = await context.Flights.Where(f =>
         //        f.Origin.Code == origin.Code
