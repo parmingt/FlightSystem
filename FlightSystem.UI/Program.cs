@@ -17,14 +17,10 @@ builder.Services.AddDbContextFactory<FlightContext>(options =>
 builder.Services.AddScoped<AirportsService>();
 builder.Services.AddScoped<FlightSearchService>();
 
-builder.Services.AddHttpClient<IRoutesClient, AmadeusClient>((serviceProvider, client) =>
+builder.Services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
 {
-    var token = builder.Configuration["amadeusToken"];
-    client.BaseAddress = new Uri("https://test.api.amadeus.com/v2/");
-    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+    client.BaseAddress = new Uri("https://test.api.amadeus.com/");
 });
-
-
 
 var app = builder.Build();
 

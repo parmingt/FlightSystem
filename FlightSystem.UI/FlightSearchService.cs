@@ -6,12 +6,10 @@ namespace FlightSystem.UI;
 
 public class FlightSearchService
 {
-    private readonly FlightContext context;
-    private readonly IRoutesClient routesClient;
+    private readonly AmadeusClient routesClient;
 
-    public FlightSearchService(FlightContext context, IRoutesClient routesClient)
+    public FlightSearchService(FlightContext context, AmadeusClient routesClient)
     {
-        this.context = context;
         this.routesClient = routesClient;
     }
 

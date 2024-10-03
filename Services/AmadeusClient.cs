@@ -1,7 +1,11 @@
 ﻿using FlightSystem.Services.Models;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -9,27 +13,45 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.Services;
 
-public class AmadeusClient : IRoutesClient
+public class AmadeusClient : IAmadeusClient
 {
     private readonly HttpClient httpClient;
+    private readonly IConfiguration configuration;
 
-    public AmadeusClient(HttpClient httpClient)
+    public AmadeusClient(HttpClient httpClient, IConfiguration configuration)
     {
         this.httpClient = httpClient;
+        this.configuration = configuration;
     }
     public async Task<List<Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateTime departure, int numAdults = 1)
     {
+        var token = await GetTokenAsync();
+        httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.access_token}");
         var formattedDate = departure.ToString("yyyy-MM-dd");
-        var endpoint = $"shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
+        var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
         var response = await httpClient.GetAsync(endpoint);
         var json = await response.Content.ReadAsStringAsync();
         var offers = JsonSerializer.Deserialize<FlightOffersResponse>(json);
-        var flights = offers.data.Select(o => 
+        var flights = offers.data.Select(o =>
             new Flight(o.itineraries[0].segments[0].departure.at, origin, destination, Decimal.Parse(o.price.total)))
             .ToList();
         return flights;
     }
 
+    private async Task<AmadeusToken> GetTokenAsync()
+    {
+        var clientId = configuration["Amadeus:ClientId"];
+        var clientSecret = configuration["Amadeus:ClientSecret"];
+        var endpoint = "v1/security/oauth2/token";
+        var dict = new Dictionary<string, string>();
+        dict.Add("grant_type", "client_credentials");
+        dict.Add("client_id", clientId);
+        dict.Add("client_secret", clientSecret);
+        var content = new FormUrlEncodedContent(dict);
+        var response = await httpClient.PostAsync(endpoint, content);
+        var json = await response.Content.ReadAsStringAsync();
+        return JsonSerializer.Deserialize<AmadeusToken>(json);
+    }
 
     public class FlightOffersResponse
     {
@@ -186,6 +208,18 @@ public class AmadeusClient : IRoutesClient
     public class Amenityprovider
     {
         public string name { get; set; }
+    }
+    public class AmadeusToken
+    {
+        public string type { get; set; }
+        public string username { get; set; }
+        public string application_name { get; set; }
+        public string client_id { get; set; }
+        public string token_type { get; set; }
+        public string access_token { get; set; }
+        public int expires_in { get; set; }
+        public string state { get; set; }
+        public string scope { get; set; }
     }
 
 }
