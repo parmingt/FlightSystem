@@ -30,13 +30,11 @@ public class AmadeusClient : IAmadeusClient
     }
     public async Task<List<Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateTime departure, int numAdults = 1)
     {
-        var token = await GetTokenAsync();
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        var client = await GetClientWithTokenAsync();
         var formattedDate = departure.ToString("yyyy-MM-dd");
         var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
-        var response = await httpClient.GetAsync(endpoint);
-        var json = await response.Content.ReadAsStringAsync();
-        var offers = JsonSerializer.Deserialize<FlightOffersResponse>(json);
+        var response = await client.GetAsync(endpoint);
+        var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
         var flights = offers.data.Select(o =>
             new Flight(o.itineraries[0].segments[0].departure.at, origin, destination, Decimal.Parse(o.price.total)))
             .ToList();
@@ -51,10 +49,12 @@ public class AmadeusClient : IAmadeusClient
         var clientId = configuration["Amadeus:ClientId"];
         var clientSecret = configuration["Amadeus:ClientSecret"];
         var endpoint = "v1/security/oauth2/token";
-        var dict = new Dictionary<string, string>();
-        dict.Add("grant_type", "client_credentials");
-        dict.Add("client_id", clientId);
-        dict.Add("client_secret", clientSecret);
+        var dict = new Dictionary<string, string>
+        {
+            { "grant_type", "client_credentials" },
+            { "client_id", clientId },
+            { "client_secret", clientSecret }
+        };
         var content = new FormUrlEncodedContent(dict);
         var response = await httpClient.PostAsync(endpoint, content);
         var json = await response.Content.ReadAsStringAsync();
@@ -64,6 +64,13 @@ public class AmadeusClient : IAmadeusClient
 
         memoryCache.Set(tokenCacheKey, token.access_token, cacheEntryOptions);
         return token.access_token;
+    }
+
+    private async Task<HttpClient> GetClientWithTokenAsync()
+    {
+        var token = await GetTokenAsync();
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        return httpClient;
     }
 
     public class FlightOffersResponse

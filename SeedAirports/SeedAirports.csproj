@@ -8,6 +8,20 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="flat-ui__data-Thu Oct 03 2024.csv" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="flat-ui__data-Thu Oct 03 2024.csv">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FlightSystem.Data\FlightSystem.Data.csproj" />
   </ItemGroup>
 
