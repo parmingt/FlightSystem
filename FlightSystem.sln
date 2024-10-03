@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSystem.UI", "FlightSy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSystem.Services", "Services\FlightSystem.Services.csproj", "{EF91ECD1-EDB8-4338-87CE-3F3726D7079F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedAirports", "SeedAirports\SeedAirports.csproj", "{2DD67532-CECC-4039-9878-2B1A906D51C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{EF91ECD1-EDB8-4338-87CE-3F3726D7079F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EF91ECD1-EDB8-4338-87CE-3F3726D7079F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EF91ECD1-EDB8-4338-87CE-3F3726D7079F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2DD67532-CECC-4039-9878-2B1A906D51C5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2DD67532-CECC-4039-9878-2B1A906D51C5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2DD67532-CECC-4039-9878-2B1A906D51C5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2DD67532-CECC-4039-9878-2B1A906D51C5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
