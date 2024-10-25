@@ -34,26 +34,36 @@
     @onclick="() => SearchFlights()"
     Disabled="selectedOrigin is NoAirportSelected || selectedDestination is NoAirportSelected">Search Flights</Button>
 
-<Grid 
-      TItem="Flight"
-      Class="table table-hover table-bordered table-striped"
-      Data ="matchingFlights"
-      AllowFiltering="true"
-      Responsive="true">
+@if (!loading)
+{    
+    <Grid 
+          TItem="Flight"
+          Class="table table-hover table-bordered table-striped"
+          Data ="matchingFlights"
+          AllowFiltering="true"
+          Responsive="true">
 
-    <GridColumns>
-        <GridColumn TItem="Flight" HeaderText="Origin" SortKeySelector="item => item.Origin.ToString()">
-            @context.Origin
-        </GridColumn>
-        <GridColumn TItem="Flight" HeaderText="Destination" SortKeySelector="item => item.Destination.ToString()">
-            @context.Destination
-        </GridColumn>
-        <GridColumn TItem="Flight" HeaderText="Date" SortKeySelector="item => item.Date">
-            @context.Date
-        </GridColumn>
-    </GridColumns>
+        <GridColumns>
+            <GridColumn TItem="Flight" HeaderText="Origin" SortKeySelector="item => item.Origin.ToString()">
+                @context.Origin
+            </GridColumn>
+            <GridColumn TItem="Flight" HeaderText="Destination" SortKeySelector="item => item.Destination.ToString()">
+                @context.Destination
+            </GridColumn>
+            <GridColumn TItem="Flight" HeaderText="Date" SortKeySelector="item => item.Date">
+                @context.Date
+            </GridColumn>
+            <GridColumn TItem="Flight" HeaderText="Cost">
+                @context.Price
+            </GridColumn>
+        </GridColumns>
 
-</Grid>
+    </Grid>
+}
+else
+{
+    <p>Loading...</p>
+}
 
 @code {
     private string originSearchText = "";
@@ -62,6 +72,7 @@
     private Airport selectedDestination = new NoAirportSelected();
     private DateOnly travelDate = DateOnly.FromDateTime(DateTime.Now);
     private List<Flight> matchingFlights = new();
+    private bool loading = false;
 
     private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
     {
@@ -90,6 +101,7 @@
 
     private async Task SearchFlights()
     {
+        loading = true;
         if (selectedOrigin is NoAirportSelected || selectedDestination is NoAirportSelected)
         {
             Console.WriteLine("No airport selected");
@@ -97,6 +109,7 @@
         }
         var flights = await flightSearchService.SearchFlightsAsync(selectedOrigin.Code, selectedDestination.Code, travelDate);
         matchingFlights = flights.Distinct().ToList();
+        loading = false;
     }
 
     protected record NoAirportSelected : Airport {

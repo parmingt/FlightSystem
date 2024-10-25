@@ -36,7 +36,8 @@ public class AmadeusClient : IAmadeusClient
         var response = await client.GetAsync(endpoint);
         var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
         var flights = offers.data.Select(o =>
-            new Flight(o.itineraries[0].segments[0].departure.at, origin, destination, Decimal.Parse(o.price.total)))
+            new Flight(o.itineraries[0].segments[0].departure.at, origin, destination
+            , new FlightPrice(Decimal.Parse(o.price.total), o.price.currency)))
             .ToList();
         return flights;
     }
