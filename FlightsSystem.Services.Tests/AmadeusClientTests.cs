@@ -10,37 +10,12 @@ namespace FlightsSystem.Services.Tests;
 [TestClass]
 public sealed class AmadeusClientTests
 {
-    internal static ServiceProvider? serviceProvider;
-
-    [AssemblyInitialize]
-    public static void AssemblyInitialize(TestContext _)
-    {
-        IServiceCollection serviceCollection = new ServiceCollection();
-        serviceCollection.AddMemoryCache();
-        serviceCollection.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
-        {
-            client.BaseAddress = new Uri("https://test.api.amadeus.com/");
-        });
-        var builder = new ConfigurationBuilder();
-        // .AddJsonFile("appsettings.json");
-        builder.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
-        IConfiguration configuration = builder.Build();
-
-        serviceCollection.AddScoped<IConfiguration>(_ => configuration);
-        serviceProvider = serviceCollection.BuildServiceProvider();
-    }
-
-    [AssemblyCleanup]
-    public static void AssemblyCleanup()
-    {
-        serviceProvider?.Dispose();
-    }
 
     [TestMethod]
     public async Task SearchFlights()
     {
-        using var scope = serviceProvider.CreateScope();
-        var client = serviceProvider.GetRequiredService<AmadeusClient>();
+        using var scope = TestHelpers.ServiceProvider.CreateScope();
+        var client = TestHelpers.ServiceProvider.GetRequiredService<AmadeusClient>();
 
         var origin = new IataCode("EWR");
         var destination = new IataCode("SLC");
