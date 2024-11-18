@@ -10,17 +10,13 @@ using System.Threading.Tasks;
 
 namespace FlightsSystem.Services.Tests;
 
-[TestClass]
 public static class TestHelpers
 {
-    internal static ServiceProvider? ServiceProvider;
-
-    [AssemblyInitialize]
-    public static void AssemblyInitialize(TestContext _)
+    public static ServiceCollection BuildServiceCollection()
     {
-        IServiceCollection serviceCollection = new ServiceCollection();
-        serviceCollection.AddMemoryCache();
-        serviceCollection.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
+        var services = new ServiceCollection();
+        services.AddMemoryCache();
+        services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
         {
             client.BaseAddress = new Uri("https://test.api.amadeus.com/");
         });
@@ -29,13 +25,7 @@ public static class TestHelpers
         builder.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
         IConfiguration configuration = builder.Build();
 
-        serviceCollection.AddScoped<IConfiguration>(_ => configuration);
-        ServiceProvider = serviceCollection.BuildServiceProvider();
-    }
-
-    [AssemblyCleanup]
-    public static void AssemblyCleanup()
-    {
-        ServiceProvider?.Dispose();
+        services.AddScoped<IConfiguration>(_ => configuration);
+        return services;
     }
 }

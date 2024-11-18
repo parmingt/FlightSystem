@@ -14,8 +14,9 @@ public sealed class AmadeusClientTests
     [TestMethod]
     public async Task SearchFlights()
     {
-        using var scope = TestHelpers.ServiceProvider.CreateScope();
-        var client = TestHelpers.ServiceProvider.GetRequiredService<AmadeusClient>();
+        using var serviceProvider = TestHelpers.BuildServiceCollection().BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        var client = serviceProvider.GetRequiredService<AmadeusClient>();
 
         var origin = new IataCode("EWR");
         var destination = new IataCode("SLC");
