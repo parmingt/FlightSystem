@@ -20,6 +20,7 @@ public static class TestHelpers
         {
             client.BaseAddress = new Uri("https://test.api.amadeus.com/");
         });
+        services.AddScoped<AirportsService>();
         var builder = new ConfigurationBuilder();
         // .AddJsonFile("appsettings.json");
         builder.AddUserSecrets(Assembly.GetExecutingAssembly(), true);

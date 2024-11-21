@@ -36,10 +36,6 @@ using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         }
     }
 }
-var query = airports.GroupBy(x => x.Code)
-              .Where(g => g.Count() > 1)
-              .Select(y => new { Element = y.Key, Counter = y.Count() })
-              .ToList();
 await context.SaveChangesAsync();
 
 class CsvLine

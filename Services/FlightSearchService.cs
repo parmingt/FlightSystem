@@ -1,8 +1,7 @@
 ﻿using FlightSystem.Data;
-using FlightSystem.Services;
 using FlightSystem.Services.Models;
 
-namespace FlightSystem.UI;
+namespace FlightSystem.Services;
 
 public class FlightSearchService
 {
@@ -13,7 +12,7 @@ public class FlightSearchService
         this.routesClient = routesClient;
     }
 
-    public async Task<List<Services.Models.Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateOnly travelDate)
+    public async Task<List<Models.Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateOnly travelDate)
     {
         var routes = await routesClient.SearchFlightsAsync(origin, destination, travelDate.ToDateTime(TimeOnly.MinValue));
         return routes;
