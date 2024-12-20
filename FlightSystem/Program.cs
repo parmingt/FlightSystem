@@ -30,14 +30,14 @@ app.UseHttpsRedirection();
 
 app.MapPost("/bookflight", (HttpContext httpContext, BookFlightRequest request, FlightContext context) =>
 {
-    var booking = new Flight
-    {
-        Origin = context.Airports.First(a => a.Code == request.origin),
-        Destination = context.Airports.First(a => a.Code == request.destination),
-        Departure = request.date
-    };
-    context.Flights.Add(booking);
-    context.SaveChanges();
+    //var booking = new Flight
+    //{
+    //    Origin = context.Airports.First(a => a.Code == request.origin),
+    //    Destination = context.Airports.First(a => a.Code == request.destination),
+    //    Departure = request.date
+    //};
+    //context.Flights.Add(booking);
+    //context.SaveChanges();
 
     return "Booked";
 })
