@@ -4,6 +4,7 @@
 @using FlightSystem.Services.Models
 @inject AirportsService airportsService
 @inject FlightSearchService flightSearchService
+@inject BookingService bookingService
 
 <h3>BookFlight</h3>
 
@@ -43,6 +44,7 @@
           Data ="matchingFlights"
           AllowFiltering="true"
           Responsive="true"
+          AllowRowClick="true"
           OnRowClick="OnRowClick">
 
         <GridColumns>
@@ -116,7 +118,7 @@ else
 
     private async Task OnRowClick(GridRowEventArgs<Flight> args)
     {
-        await ModalService.ShowAsync(new ModalOption { Type = ModalType.Primary, Title = "Event: Row Click", Message = $"Id: {args.Item.Id}, Name: {args.Item.Name}" });
+        await bookingService.BookFlight(args.Item);
     }
 
     protected record NoAirportSelected : Airport {

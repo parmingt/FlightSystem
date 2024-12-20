@@ -17,6 +17,7 @@ builder.Services.AddDbContextFactory<FlightContext>(options =>
 
 builder.Services.AddScoped<AirportsService>();
 builder.Services.AddScoped<FlightSearchService>();
+builder.Services.AddScoped<BookingService>();
 
 builder.Services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
 {
