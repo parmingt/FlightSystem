@@ -6,4 +6,8 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.Services.Models;
 
-public record Segment(string CarrierCode, string Number);
+public record Segment(string CarrierCode
+    , string Number
+    , IataCode Origin
+    , IataCode Destination
+    , DateTime Departure);

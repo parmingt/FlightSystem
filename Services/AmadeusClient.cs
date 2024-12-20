@@ -38,7 +38,12 @@ public class AmadeusClient : IAmadeusClient
         var flights = offers.data.Select(o =>
             new Flight(o.itineraries[0].segments[0].departure.at, origin, destination
                 , new FlightPrice(Decimal.Parse(o.price.total), o.price.currency)
-                , o.itineraries[0].segments.ToList().Select(s => new Models.Segment(s.carrierCode, s.number)).ToList()
+                , o.itineraries[0].segments.ToList().Select(s => 
+                    new Models.Segment(s.carrierCode
+                    , s.number
+                    , new IataCode(s.departure.iataCode)
+                    , new IataCode(s.arrival.iataCode)
+                    , s.departure.at)).ToList()
             )).ToList();
         return flights;
     }
