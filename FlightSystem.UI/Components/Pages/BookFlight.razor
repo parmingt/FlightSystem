@@ -42,7 +42,8 @@
           Class="table table-hover table-bordered table-striped"
           Data ="matchingFlights"
           AllowFiltering="true"
-          Responsive="true">
+          Responsive="true"
+          OnRowClick="OnRowClick">
 
         <GridColumns>
             <GridColumn TItem="Flight" HeaderText="Origin" SortKeySelector="item => item.Origin.ToString()">
@@ -111,6 +112,11 @@ else
         var flights = await flightSearchService.SearchFlightsAsync(selectedOrigin.Code, selectedDestination.Code, travelDate);
         matchingFlights = flights.Distinct().ToList();
         loading = false;
+    }
+
+    private async Task OnRowClick(GridRowEventArgs<Flight> args)
+    {
+        await ModalService.ShowAsync(new ModalOption { Type = ModalType.Primary, Title = "Event: Row Click", Message = $"Id: {args.Item.Id}, Name: {args.Item.Name}" });
     }
 
     protected record NoAirportSelected : Airport {

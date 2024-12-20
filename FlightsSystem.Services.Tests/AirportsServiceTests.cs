@@ -17,7 +17,6 @@ namespace FlightsSystem.Services.Tests;
 public class AirportsServiceTests
 {
     private static SqliteConnection _connection;
-    private static DbContextOptions<FlightContext> _dbContextOptions;
     private static ServiceProvider _serviceProvider;
 
     [ClassInitialize]
@@ -29,12 +28,12 @@ public class AirportsServiceTests
         _connection.Open();
 
         // These options will be used by the context instances in this test suite, including the connection opened above.
-        _dbContextOptions = new DbContextOptionsBuilder<FlightContext>()
+        var dbContextOptions = new DbContextOptionsBuilder<FlightContext>()
         .UseSqlite(_connection)
             .Options;
 
         // Create the schema and seed some data
-        using var context = new FlightContext(_dbContextOptions);
+        using var context = new FlightContext(dbContextOptions);
         context.Database.EnsureCreated();
         context.Airports.AddRange(new List<Airport> {
             new Airport(){Code = "EWR", Name = "Newark" }
@@ -58,6 +57,6 @@ public class AirportsServiceTests
     {
         var service = _serviceProvider.GetRequiredService<AirportsService>();
         var airports = await service.SearchAirportsAsync("EWR");
-        Assert.IsTrue(airports.Any());
+        Assert.IsTrue(airports.Count() == 1);
     }
 }
