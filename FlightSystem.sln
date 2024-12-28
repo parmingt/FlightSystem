@@ -15,6 +15,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SeedAirports", "SeedAirport
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightsSystem.Services.Tests", "FlightsSystem.Services.Tests\FlightsSystem.Services.Tests.csproj", "{C702F7D5-6D83-4608-A633-7588B9E4F673}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmadeusSDK", "AmadeusSDK\AmadeusSDK.csproj", "{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{C702F7D5-6D83-4608-A633-7588B9E4F673}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C702F7D5-6D83-4608-A633-7588B9E4F673}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C702F7D5-6D83-4608-A633-7588B9E4F673}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

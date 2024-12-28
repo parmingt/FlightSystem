@@ -1,85 +1,13 @@
-﻿using FlightSystem.Services.Models;
-using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http.Headers;
-using System.Net.Http.Json;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace FlightSystem.Services;
+namespace AmadeusSDK;
 
-public class AmadeusClient : IAmadeusClient
+public class Models
 {
-    private readonly HttpClient httpClient;
-    private readonly IConfiguration configuration;
-    private readonly IMemoryCache memoryCache;
-    private readonly string tokenCacheKey = "amadeusToken";
-
-    public AmadeusClient(HttpClient httpClient, IConfiguration configuration, IMemoryCache memoryCache)
-    {
-        this.httpClient = httpClient;
-        this.configuration = configuration;
-        this.memoryCache = memoryCache;
-    }
-    public async Task<List<Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateTime departure, int numAdults = 1)
-    {
-        var client = await GetClientWithTokenAsync();
-        var formattedDate = departure.ToString("yyyy-MM-dd");
-        var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
-        var response = await client.GetAsync(endpoint);
-        var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
-        var flights = offers.data.Select(o =>
-            new Flight(o.itineraries[0].segments[0].departure.at, origin, destination
-                , new FlightPrice(Decimal.Parse(o.price.total), o.price.currency)
-                , o.itineraries[0].segments.ToList().Select(s => 
-                    new Models.Segment(s.carrierCode
-                    , s.number
-                    , new IataCode(s.departure.iataCode)
-                    , new IataCode(s.arrival.iataCode)
-                    , s.departure.at)).ToList()
-            )).ToList();
-        return flights;
-    }
-
-    private async Task<string> GetTokenAsync()
-    {
-        if (memoryCache.TryGetValue(tokenCacheKey, out string cacheValue))
-            return cacheValue;
-
-        var clientId = configuration["Amadeus:ClientId"];
-        var clientSecret = configuration["Amadeus:ClientSecret"];
-        var endpoint = "v1/security/oauth2/token";
-        var dict = new Dictionary<string, string>
-        {
-            { "grant_type", "client_credentials" },
-            { "client_id", clientId },
-            { "client_secret", clientSecret }
-        };
-        var content = new FormUrlEncodedContent(dict);
-        var response = await httpClient.PostAsync(endpoint, content);
-        var json = await response.Content.ReadAsStringAsync();
-        var token = JsonSerializer.Deserialize<AmadeusToken>(json);
-        var cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetSlidingExpiration(TimeSpan.FromSeconds(token.expires_in));
-
-        memoryCache.Set(tokenCacheKey, token.access_token, cacheEntryOptions);
-        return token.access_token;
-    }
-
-    private async Task<HttpClient> GetClientWithTokenAsync()
-    {
-        var token = await GetTokenAsync();
-        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-        return httpClient;
-    }
-
     public class FlightOffersResponse
     {
         public Meta meta { get; set; }
@@ -248,5 +176,4 @@ public class AmadeusClient : IAmadeusClient
         public string state { get; set; }
         public string scope { get; set; }
     }
-
 }

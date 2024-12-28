@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AmadeusSDK\AmadeusSDK.csproj" />
     <ProjectReference Include="..\FlightSystem.Data\FlightSystem.Data.csproj" />
   </ItemGroup>
 
