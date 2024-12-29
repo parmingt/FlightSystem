@@ -25,20 +25,6 @@ public static class ServiceCollectionExtensions
             client.BaseAddress = new Uri("https://test.api.amadeus.com/");
         });
 
-        serviceCollection.AddSingleton<AmadeusClient>();
         return serviceCollection;
     }
-}
-
-public class AmadeusClientOptions
-{
-    public AmadeusClientOptions(string clientId, string clientSecret)
-    {
-        ClientId = clientId;
-        ClientSecret = clientSecret;
-    }
-
-        
-    string ClientId { get; set; }
-    string ClientSecret {  get; set; }
 }

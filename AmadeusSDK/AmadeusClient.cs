@@ -23,11 +23,11 @@ public class AmadeusClient : IAmadeusClient
     private readonly IMemoryCache memoryCache;
     private readonly string tokenCacheKey = "amadeusToken";
 
-    public AmadeusClient(IMemoryCache memoryCache, HttpClient httpClient, string clientId, string clientSecret)
+    public AmadeusClient(IMemoryCache memoryCache, HttpClient httpClient, AmadeusClientOptions options)
     {
         this.httpClient = httpClient;
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
+        this.clientId = options.ClientId;
+        this.clientSecret = options.ClientSecret;
         this.memoryCache = memoryCache;
     }
     public async Task<List<Offers>> SearchFlightsAsync(string origin, string destination, DateTime departure, int numAdults = 1)
