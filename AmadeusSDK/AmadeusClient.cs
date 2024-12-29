@@ -1,5 +1,4 @@
-﻿using FlightSystem.Services.Models;
-using Microsoft.Extensions.Caching.Memory;
+﻿using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -19,19 +18,22 @@ namespace AmadeusSDK;
 public class AmadeusClient : IAmadeusClient
 {
     private readonly HttpClient httpClient;
-    private readonly IConfiguration configuration;
+    private readonly string clientId;
+    private readonly string clientSecret;
     private readonly IMemoryCache memoryCache;
     private readonly string tokenCacheKey = "amadeusToken";
 
-    public AmadeusClient(HttpClient httpClient, IConfiguration configuration, IMemoryCache memoryCache)
+    public AmadeusClient(IMemoryCache memoryCache, HttpClient httpClient, string clientId, string clientSecret)
     {
         this.httpClient = httpClient;
-        this.configuration = configuration;
+        this.clientId = clientId;
+        this.clientSecret = clientSecret;
         this.memoryCache = memoryCache;
     }
     public async Task<List<Offers>> SearchFlightsAsync(string origin, string destination, DateTime departure, int numAdults = 1)
     {
-        var client = await GetClientWithTokenAsync();
+        var token = await GetTokenAsync();
+        var client = await GetClientWithTokenAsync(token);
         var formattedDate = departure.ToString("yyyy-MM-dd");
         var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
         var response = await client.GetAsync(endpoint);
@@ -39,13 +41,11 @@ public class AmadeusClient : IAmadeusClient
         return offers!.data.ToList();
     }
 
-    private async Task<string> GetTokenAsync()
+    public async Task<string> GetTokenAsync()
     {
         if (memoryCache.TryGetValue(tokenCacheKey, out string cacheValue))
             return cacheValue;
 
-        var clientId = configuration["Amadeus:ClientId"];
-        var clientSecret = configuration["Amadeus:ClientSecret"];
         var endpoint = "v1/security/oauth2/token";
         var dict = new Dictionary<string, string>
         {
@@ -64,13 +64,10 @@ public class AmadeusClient : IAmadeusClient
         return token.access_token;
     }
 
-    private async Task<HttpClient> GetClientWithTokenAsync()
+    private async Task<HttpClient> GetClientWithTokenAsync(string token)
     {
-        var token = await GetTokenAsync();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return httpClient;
     }
-
-    
 
 }

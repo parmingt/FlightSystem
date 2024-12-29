@@ -1,3 +1,4 @@
+using AmadeusSDK;
 using FlightSystem.Data;
 using FlightSystem.Services;
 using FlightSystem.UI.Components;
@@ -15,14 +16,11 @@ builder.Services.AddMemoryCache();
 builder.Services.AddDbContextFactory<FlightContext>(options =>
     options.UseSqlite(builder.Configuration["ConnectionStrings:SQLiteDefault"]), ServiceLifetime.Singleton);
 
+builder.Services.AddAmadeusClient(builder.Configuration["Amadeus:ClientId"], builder.Configuration["Amadeus:ClientSecret"]);
+
 builder.Services.AddScoped<AirportsService>();
 builder.Services.AddScoped<FlightSearchService>();
 builder.Services.AddScoped<BookingService>();
-
-builder.Services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
-{
-    client.BaseAddress = new Uri("https://test.api.amadeus.com/");
-});
 
 var app = builder.Build();
 
