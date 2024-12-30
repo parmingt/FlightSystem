@@ -6,4 +6,4 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.Services.Models;
 
-public record Booking(List<Segment> segments);
+public record Booking(List<Segment> Segments);

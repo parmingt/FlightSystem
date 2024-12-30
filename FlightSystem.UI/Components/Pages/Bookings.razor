@@ -1,0 +1,45 @@
+﻿@page "/bookings"
+@using FlightSystem.Services
+@using FlightSystem.Services.Models
+@inject BookingService bookingService
+
+<h3>Bookings</h3>
+@if (!loading)
+{
+    <Grid TItem="Booking"
+          Class="table table-hover table-bordered table-striped"
+          Data="bookings"
+          AllowFiltering="true"
+          Responsive="true"
+          AllowRowClick="true">
+
+        <GridColumns>
+            <GridColumn TItem="Booking" HeaderText="Origin">
+                @context.Segments?.FirstOrDefault()?.Origin.ToString()
+            </GridColumn>
+            <GridColumn TItem="Booking" HeaderText="Destination">
+                @context.Segments?.LastOrDefault()?.Destination.ToString()
+            </GridColumn>
+            <GridColumn TItem="Booking" HeaderText="Date">
+                @context.Segments?.FirstOrDefault()?.Departure
+            </GridColumn>
+        </GridColumns>
+
+    </Grid>
+}
+else
+{
+    <p>Loading...</p>
+}
+
+@code {
+    private bool loading = true;
+    private List<Booking> bookings = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        loading = true;
+        bookings = await bookingService.GetBookings();
+        loading = false;
+    }
+}

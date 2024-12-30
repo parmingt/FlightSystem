@@ -34,13 +34,23 @@ public class BookingService
 
     public async Task<List<Models.Booking>> GetBookings()
     {
-        var bookings = await context.Bookings.ToListAsync();
+        var bookings = await context.Bookings
+            .Include(b => b.Segments).ThenInclude(s => s.Origin)
+            .Include(b => b.Segments).ThenInclude(s => s.Destination)
+        .ToListAsync();
+
+        if (bookings is null)
+            return new List<Models.Booking>();
+
         return bookings.Select(b => 
             new Models.Booking(
-                b.Segments.Select(s => 
+                b.Segments?.Select(s => 
                     new Models.Segment("test", "11"
-                    , new IataCode(s.Origin.Code)
-                    , new IataCode(s.Destination.Code), s.Departure)).ToList()))
+                        , new IataCode(s.Origin.Code)
+                        , new IataCode(s.Destination.Code), s.Departure)
+                    ).ToList() 
+                    ?? new List<Models.Segment>()
+                    ))
             .ToList();
     }
 }
