@@ -9,7 +9,7 @@ public class FlightSearchService
 {
     private readonly AmadeusClient routesClient;
 
-    public FlightSearchService(FlightContext context, AmadeusClient routesClient)
+    public FlightSearchService(AmadeusClient routesClient)
     {
         this.routesClient = routesClient;
     }
