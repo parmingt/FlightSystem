@@ -22,6 +22,8 @@ public class UnitTests
     {
 
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
+
+        // mock for general http call
         handlerMock
            .Protected()
            // Setup the PROTECTED method to mock
@@ -41,6 +43,7 @@ public class UnitTests
            })
            .Verifiable();
 
+        // mock for token call
         handlerMock
            .Protected()
            // Setup the PROTECTED method to mock
