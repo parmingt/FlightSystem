@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightsSystem.Services.Test
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmadeusSDK", "AmadeusSDK\AmadeusSDK.csproj", "{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmadeusSDK.Tests", "AmadeusSDK.Tests\AmadeusSDK.Tests.csproj", "{FF2E61BC-8C39-4A77-B0E0-028E8DA281FA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD2EC514-A218-43C7-86E8-4B2E57FFBC52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FF2E61BC-8C39-4A77-B0E0-028E8DA281FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FF2E61BC-8C39-4A77-B0E0-028E8DA281FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FF2E61BC-8C39-4A77-B0E0-028E8DA281FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FF2E61BC-8C39-4A77-B0E0-028E8DA281FA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
