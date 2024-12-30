@@ -20,7 +20,6 @@ public class UnitTests
     [TestMethod]
     public async Task SearchFlights()
     {
-        var services = TestHelpers.BuildServiceCollection();
 
         var handlerMock = new Mock<HttpMessageHandler>(MockBehavior.Strict);
         handlerMock
@@ -35,19 +34,39 @@ public class UnitTests
            .ReturnsAsync(new HttpResponseMessage()
            {
                StatusCode = HttpStatusCode.OK,
-               Content = JsonContent.Create(new FlightOffersResponse())
+               Content = JsonContent.Create(new FlightOffersResponse()
+               {
+                   data = new Offers[] { new Offers() }
+               })
            })
            .Verifiable();
 
-        // use real http client with mocked handler here
-        var httpClient = new HttpClient(handlerMock.Object)
-        {
-            BaseAddress = new Uri("http://test.com/"),
-        };
-        services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
-        {
-            client.BaseAddress = new Uri("https://test.api.amadeus.com/");
-        });
+        handlerMock
+           .Protected()
+           // Setup the PROTECTED method to mock
+           .Setup<Task<HttpResponseMessage>>(
+              "SendAsync",
+              ItExpr.Is<HttpRequestMessage>(m => m.Content is FormUrlEncodedContent),
+              ItExpr.IsAny<CancellationToken>()
+           )
+           // prepare the expected response of the mocked http call
+           .ReturnsAsync(new HttpResponseMessage()
+           {
+               StatusCode = HttpStatusCode.OK,
+               Content = JsonContent.Create(new AmadeusToken()
+               {
+                   expires_in = 20,
+                   access_token = "123"
+               })
+           })
+           .Verifiable();
+
+        var services = new ServiceCollection();
+        services.AddAmadeusClient("", "");
+
+        // Replace httpclient with mock
+        services.AddHttpClient<AmadeusClient>()
+            .ConfigurePrimaryHttpMessageHandler(() => handlerMock.Object);
 
         using var serviceProvider = services.BuildServiceProvider();
         using var scope = serviceProvider.CreateScope();
