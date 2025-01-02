@@ -5,6 +5,7 @@
 @inject AirportsService airportsService
 @inject FlightSearchService flightSearchService
 @inject BookingService bookingService
+@inject NavigationManager NavigationManager
 
 <h3>BookFlight</h3>
 
@@ -119,6 +120,7 @@ else
     private async Task OnRowClick(GridRowEventArgs<Flight> args)
     {
         await bookingService.BookFlight(args.Item);
+        NavigationManager.NavigateTo("bookings");
     }
 
     protected record NoAirportSelected : Airport {
