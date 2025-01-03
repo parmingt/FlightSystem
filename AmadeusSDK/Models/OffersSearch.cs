@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AmadeusSDK;
+namespace AmadeusSDK.Models;
 
-public class Models
+public class OffersSearch
 {
     public class FlightOffersResponse
     {

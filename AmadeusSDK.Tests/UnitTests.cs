@@ -9,7 +9,7 @@ using Moq;
 using Moq.Protected;
 using System.Net.Http.Json;
 using AmadeusSDK.Tests;
-using static AmadeusSDK.Models;
+using static AmadeusSDK.Models.OffersSearch;
 using AmadeusSDK;
 
 namespace FlightsSystem.Services.Tests;

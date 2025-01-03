@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using AmadeusSDK.Models;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
-using static AmadeusSDK.Models;
+using static AmadeusSDK.Models.OffersSearch;
 
 namespace AmadeusSDK;
 
@@ -32,13 +33,23 @@ public class AmadeusClient : IAmadeusClient
     }
     public async Task<List<Offers>> SearchFlightsAsync(string origin, string destination, DateTime departure, int numAdults = 1)
     {
-        var token = await GetTokenAsync();
-        var client = await GetClientWithTokenAsync(token);
+        var client = await GetClientWithTokenAsync();
         var formattedDate = departure.ToString("yyyy-MM-dd");
         var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
         var response = await client.GetAsync(endpoint);
         var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
         return offers!.data.ToList();
+    }
+
+    public async Task<List<PricingConfirmation>> ConfirmFLightOffer(List<PricingConfirmation> offersToConfirm)
+    {
+        var client = await GetClientWithTokenAsync();
+        var endpoint = $"v2/shopping/flight-offers/pricing";
+
+        var response = await client.PostAsJsonAsync(endpoint, offersToConfirm);
+        var json = await response.Content.ReadAsStringAsync();
+        var confirmedOffers = JsonSerializer.Deserialize<List<PricingConfirmation>>(json);
+        return confirmedOffers;
     }
 
     public async Task<string> GetTokenAsync()
@@ -64,8 +75,9 @@ public class AmadeusClient : IAmadeusClient
         return token.access_token;
     }
 
-    private async Task<HttpClient> GetClientWithTokenAsync(string token)
+    private async Task<HttpClient> GetClientWithTokenAsync()
     {
+        var token = await GetTokenAsync();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return httpClient;
     }
