@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
+using static AmadeusSDK.Models.OffersSearch;
 
 namespace AmadeusSDK.Tests;
 
@@ -20,5 +21,23 @@ public sealed class IntegrationTests
         var flights = await client.SearchFlightsAsync(origin, destination, DateTime.Now);
 
         Assert.IsTrue(flights.Any());
+    }
+
+    [TestMethod]
+    public async Task FlightOffers()
+    {
+        using var serviceProvider = TestHelpers.BuildServiceCollection().BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        var client = serviceProvider.GetRequiredService<AmadeusClient>();
+
+        var origin = "EWR";
+        var destination = "SLC";
+
+        var flights = await client.SearchFlightsAsync(origin, destination, DateTime.Now);
+
+        var offers = new List<Offers> { flights.First() };
+        var confirmation = await client.ConfirmFlightOffer(offers);
+
+        Assert.IsTrue(confirmation.Any());
     }
 }

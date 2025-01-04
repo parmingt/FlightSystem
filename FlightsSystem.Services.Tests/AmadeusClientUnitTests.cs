@@ -10,7 +10,8 @@ using System.Net;
 using Moq;
 using Moq.Protected;
 using System.Net.Http.Json;
-using static FlightSystem.Services.AmadeusClient;
+using AmadeusSDK;
+using static AmadeusSDK.Models.OffersSearch;
 
 namespace FlightsSystem.Services.Tests;
 
@@ -56,7 +57,7 @@ public class AmadeusClientUnitTests
         var origin = new IataCode("EWR");
         var destination = new IataCode("SLC");
 
-        var flights = await amadeusClient.SearchFlightsAsync(origin, destination, DateTime.Now);
+        var flights = await amadeusClient.SearchFlightsAsync(origin.ToString(), destination.ToString(), DateTime.Now);
 
         Assert.IsTrue(flights.Any());
     }

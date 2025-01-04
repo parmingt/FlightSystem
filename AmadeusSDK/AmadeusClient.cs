@@ -16,7 +16,7 @@ using static AmadeusSDK.Models.OffersSearch;
 
 namespace AmadeusSDK;
 
-public class AmadeusClient : IAmadeusClient
+public class AmadeusClient
 {
     private readonly HttpClient httpClient;
     private readonly string clientId;
@@ -41,15 +41,24 @@ public class AmadeusClient : IAmadeusClient
         return offers!.data.ToList();
     }
 
-    public async Task<List<PricingConfirmation>> ConfirmFLightOffer(List<PricingConfirmation> offersToConfirm)
+    public async Task<List<Offers>> ConfirmFlightOffer(List<Offers> offersToConfirm)
     {
         var client = await GetClientWithTokenAsync();
-        var endpoint = $"v2/shopping/flight-offers/pricing";
+        var endpoint = $"v1/shopping/flight-offers/pricing";
 
-        var response = await client.PostAsJsonAsync(endpoint, offersToConfirm);
+        var request = new PricingConfirmation()
+        {
+            data = new Data
+            {
+                type = "flight-offers-pricing",
+                flightOffers = offersToConfirm
+            }
+        };
+
+        var response = await client.PostAsJsonAsync(endpoint, request);
         var json = await response.Content.ReadAsStringAsync();
-        var confirmedOffers = JsonSerializer.Deserialize<List<PricingConfirmation>>(json);
-        return confirmedOffers;
+        var confirmedOffers = JsonSerializer.Deserialize<PricingConfirmation>(json);
+        return confirmedOffers.data.flightOffers;
     }
 
     public async Task<string> GetTokenAsync()
