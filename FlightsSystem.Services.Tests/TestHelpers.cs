@@ -17,15 +17,13 @@ public static class TestHelpers
     {
         var services = new ServiceCollection();
         services.AddMemoryCache();
-        services.AddHttpClient<AmadeusClient>((serviceProvider, client) =>
-        {
-            client.BaseAddress = new Uri("https://test.api.amadeus.com/");
-        });
         services.AddScoped<AirportsService>();
         var builder = new ConfigurationBuilder();
         // .AddJsonFile("appsettings.json");
         builder.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
         IConfiguration configuration = builder.Build();
+        services.AddAmadeusClient(configuration["Amadeus:ClientId"]
+            , configuration["Amadeus:ClientSecret"]);
 
         services.AddScoped<IConfiguration>(_ => configuration);
         return services;
