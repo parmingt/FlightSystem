@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyModel;
 using System.Reflection;
 using static AmadeusSDK.Models.OffersSearch;
 
@@ -39,5 +40,6 @@ public sealed class IntegrationTests
         var confirmation = await client.ConfirmFlightOffer(offers);
 
         Assert.IsTrue(confirmation.Any());
+        Assert.IsTrue(flights.First().price.total == confirmation.First().price.total);
     }
 }

@@ -32,7 +32,7 @@ public class BookingService
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<Models.Booking>> GetBookings()
+    public async Task<List<Flight>> GetBookings()
     {
         var bookings = await context.Bookings
             .Include(b => b.Segments).ThenInclude(s => s.Origin)
@@ -40,17 +40,18 @@ public class BookingService
         .ToListAsync();
 
         if (bookings is null)
-            return new List<Models.Booking>();
+            return new();
 
         return bookings.Select(b => 
-            new Models.Booking(
-                b.Segments?.Select(s => 
+            new Flight(
+                b.Segments.First().Departure,
+                new Price(0, "USD"),
+                b.Segments.Select(s => 
                     new Models.Segment("test", "11"
                         , new IataCode(s.Origin.Code)
                         , new IataCode(s.Destination.Code), s.Departure)
                     ).ToList() 
-                    ?? new List<Models.Segment>()
-                    ))
+                ))
             .ToList();
     }
 }

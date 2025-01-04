@@ -6,4 +6,10 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.Services.Models;
 
-public record Booking(List<Segment> Segments);
+public record Price(decimal Total, string Currency)
+{
+    public override string ToString()
+    {
+        return $"{Total} {Currency}";
+    }
+};

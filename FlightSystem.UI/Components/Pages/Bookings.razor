@@ -6,7 +6,7 @@
 <h3>Bookings</h3>
 @if (!loading)
 {
-    <Grid TItem="Booking"
+    <Grid TItem="Flight"
           Class="table table-hover table-bordered table-striped"
           Data="bookings"
           AllowFiltering="true"
@@ -14,14 +14,17 @@
           AllowRowClick="true">
 
         <GridColumns>
-            <GridColumn TItem="Booking" HeaderText="Origin">
+            <GridColumn TItem="Flight" HeaderText="Origin">
                 @context.Segments?.FirstOrDefault()?.Origin.ToString()
             </GridColumn>
-            <GridColumn TItem="Booking" HeaderText="Destination">
+            <GridColumn TItem="Flight" HeaderText="Destination">
                 @context.Segments?.LastOrDefault()?.Destination.ToString()
             </GridColumn>
-            <GridColumn TItem="Booking" HeaderText="Date">
+            <GridColumn TItem="Flight" HeaderText="Date">
                 @context.Segments?.FirstOrDefault()?.Departure
+            </GridColumn>
+            <GridColumn TItem="Flight" HeaderText="Price">
+                @context.Price.Total @context.Price.Currency
             </GridColumn>
         </GridColumns>
 
@@ -34,7 +37,7 @@ else
 
 @code {
     private bool loading = true;
-    private List<Booking> bookings = new();
+    private List<Flight> bookings = new();
 
     protected override async Task OnInitializedAsync()
     {

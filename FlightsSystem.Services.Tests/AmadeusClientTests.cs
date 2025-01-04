@@ -1,4 +1,5 @@
-﻿using FlightSystem.Services;
+﻿using AmadeusSDK;
+using FlightSystem.Services;
 using FlightSystem.Services.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +22,7 @@ public sealed class AmadeusClientTests
         var origin = new IataCode("EWR");
         var destination = new IataCode("SLC");
 
-        var flights = await client.SearchFlightsAsync(origin, destination, DateTime.Now);
+        var flights = await client.SearchFlightsAsync(origin.ToString(), destination.ToString(), DateTime.Now);
 
         Assert.IsTrue(flights.Any());
     }

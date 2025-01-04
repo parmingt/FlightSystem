@@ -1,11 +1,8 @@
 ﻿namespace FlightSystem.Services.Models;
 
-public record Flight(DateTime Date, IataCode Origin, IataCode Destination, FlightPrice Price, List<Segment> Segments);
-
-public record FlightPrice(decimal Total, string Currency)
+public record Flight(DateTime Date, Price Price, List<Segment> Segments)
 {
-    public override string ToString()
-    {
-        return $"{Total} {Currency}";
-    }
+    public IataCode Origin => Segments.First().Origin;
+    public IataCode Destination => Segments.First().Destination;
 };
+
