@@ -3,6 +3,7 @@ using System;
 using FlightSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightSystem.Data.Migrations
 {
     [DbContext(typeof(FlightContext))]
-    partial class FlightContextModelSnapshot : ModelSnapshot
+    [Migration("20250105113601_add identity attributes")]
+    partial class addidentityattributes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -45,7 +48,12 @@ namespace FlightSystem.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("PriceId")
+                        .HasColumnType("TEXT");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("PriceId");
 
                     b.ToTable("Bookings");
                 });
@@ -71,9 +79,6 @@ namespace FlightSystem.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("TEXT");
-
                     b.Property<Guid>("CurrencyId")
                         .HasColumnType("TEXT");
 
@@ -81,9 +86,6 @@ namespace FlightSystem.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookingId")
-                        .IsUnique();
 
                     b.HasIndex("CurrencyId");
 
@@ -119,14 +121,19 @@ namespace FlightSystem.Data.Migrations
                     b.ToTable("Segments");
                 });
 
-            modelBuilder.Entity("FlightSystem.Data.Price", b =>
+            modelBuilder.Entity("FlightSystem.Data.Booking", b =>
                 {
-                    b.HasOne("FlightSystem.Data.Booking", null)
-                        .WithOne("Price")
-                        .HasForeignKey("FlightSystem.Data.Price", "BookingId")
+                    b.HasOne("FlightSystem.Data.Price", "Price")
+                        .WithMany()
+                        .HasForeignKey("PriceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Price");
+                });
+
+            modelBuilder.Entity("FlightSystem.Data.Price", b =>
+                {
                     b.HasOne("FlightSystem.Data.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
@@ -161,9 +168,6 @@ namespace FlightSystem.Data.Migrations
 
             modelBuilder.Entity("FlightSystem.Data.Booking", b =>
                 {
-                    b.Navigation("Price")
-                        .IsRequired();
-
                     b.Navigation("Segments");
                 });
 #pragma warning restore 612, 618

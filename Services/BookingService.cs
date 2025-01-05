@@ -26,7 +26,12 @@ public class BookingService
                 Origin = context.Airports.First(a => a.Code == s.Origin.ToString()),
                 Destination = context.Airports.First(a => a.Code == s.Destination.ToString()),
                 Departure = s.Departure
-            }).ToList()
+            }).ToList(),
+            Price = new Data.Price()
+            {
+                Total = selectedFlight.Price.Total,
+                Currency = context.Currency.First(c => c.Name == selectedFlight.Price.Currency)
+            }
         };
         context.Bookings.Add(newBooking);
         await context.SaveChangesAsync();
@@ -37,6 +42,7 @@ public class BookingService
         var bookings = await context.Bookings
             .Include(b => b.Segments).ThenInclude(s => s.Origin)
             .Include(b => b.Segments).ThenInclude(s => s.Destination)
+            .Include(b => b.Price).ThenInclude(p => p.Currency)
         .ToListAsync();
 
         if (bookings is null)
@@ -45,7 +51,7 @@ public class BookingService
         return bookings.Select(b => 
             new Flight(
                 b.Segments.First().Departure,
-                new Price(0, "USD"),
+                new Models.Price(b.Price.Total, b.Price.Currency.Name),
                 b.Segments.Select(s => 
                     new Models.Segment("test", "11"
                         , new IataCode(s.Origin.Code)

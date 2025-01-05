@@ -11,6 +11,7 @@ public class FlightContext : DbContext
     public DbSet<Airport> Airports { get; set; }
     public DbSet<Segment> Segments { get; set; }
     public DbSet<Booking> Bookings { get; set; }
+    public DbSet<Currency> Currency { get; set; }
 
     public FlightContext(DbContextOptions<FlightContext> options)
     : base(options)
@@ -45,5 +46,25 @@ public class Booking
     [Key]
     public Guid? Id { get; set; }
 
-    public required List<Segment> Segments { get; set; } 
+    public required Price Price { get; set; }
+
+    public required ICollection<Segment> Segments { get; set; }
+}
+
+public class Price
+{
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
+    public Guid? Id { get; set; }
+    public Guid BookingId { get; set; }
+    public decimal Total { get; set; }
+    public required Currency Currency { get; set; }
+}
+
+public class Currency
+{
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
+    public Guid? Id { get; set; }
+    public required string Name { get; set; } 
 }
