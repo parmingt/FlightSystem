@@ -12,10 +12,18 @@ public class FlightContext : DbContext
     public DbSet<Segment> Segments { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<Currency> Currency { get; set; }
+    public DbSet<BookingStatus> BookingStatus { get; set; }
 
     public FlightContext(DbContextOptions<FlightContext> options)
     : base(options)
     { }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<BookingStatus>().HasData(new BookingStatus[] {
+                new() {Id=1,Name="Pending"},
+                new() {Id=2,Name="Confirmed"}
+            });
+    }
 }
 
 [Index(nameof(Code), IsUnique = true)]
@@ -49,6 +57,7 @@ public class Booking
     public required Price Price { get; set; }
 
     public required ICollection<Segment> Segments { get; set; }
+    public required BookingStatus Status { get; set; }
 }
 
 public class Price
@@ -67,4 +76,12 @@ public class Currency
     [Key]
     public Guid? Id { get; set; }
     public required string Name { get; set; } 
+}
+
+public class BookingStatus
+{
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
+    public int Id { get; set; }
+    public required string Name { get; set; }
 }

@@ -31,7 +31,8 @@ public class BookingService
             {
                 Total = selectedFlight.Price.Total,
                 Currency = context.Currency.First(c => c.Name == selectedFlight.Price.Currency)
-            }
+            },
+            Status = context.BookingStatus.First(s => s.Name == "Pending")
         };
         context.Bookings.Add(newBooking);
         await context.SaveChangesAsync();
