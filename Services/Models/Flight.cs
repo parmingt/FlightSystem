@@ -3,6 +3,6 @@
 public record Flight(DateTime Date, Price Price, List<Segment> Segments)
 {
     public IataCode Origin => Segments.First().Origin;
-    public IataCode Destination => Segments.First().Destination;
+    public IataCode Destination => Segments.Last().Destination;
 };
 
