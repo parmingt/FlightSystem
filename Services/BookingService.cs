@@ -12,13 +12,23 @@ namespace FlightSystem.Services;
 public class BookingService
 {
     private FlightContext context;
+    private readonly FlightSearchService flightSearchService;
 
-    public BookingService(FlightContext context)
+    public BookingService(FlightContext context, FlightSearchService flightSearchService)
     {
         this.context = context;
+        this.flightSearchService = flightSearchService;
     }
     public async Task BookFlight(Flight selectedFlight)
     {
+        var confirmed = await flightSearchService.ConfirmFlight(selectedFlight);
+
+        if (!confirmed)
+        {
+            Console.WriteLine("outdated flight");
+            return;
+        }
+
         var newBooking = new Data.Booking()
         {
             Segments = selectedFlight.Segments.Select(s => new Data.Segment
@@ -58,7 +68,7 @@ public class BookingService
                         , new IataCode(s.Origin.Code)
                         , new IataCode(s.Destination.Code), s.Departure)
                     ).ToList() 
-                ))
+                , ""))
             .ToList();
     }
 }

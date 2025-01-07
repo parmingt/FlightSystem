@@ -21,6 +21,6 @@ internal static class Extensions
                 , new IataCode(s.departure.iataCode)
                 , new IataCode(s.arrival.iataCode)
                 , s.departure.at)).ToList()
-                );
+            , offer.id);
     }
 }

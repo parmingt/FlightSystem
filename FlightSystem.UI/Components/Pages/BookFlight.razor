@@ -75,7 +75,7 @@ else
     private string destinationSearchText = "";
     private Airport selectedOrigin = new NoAirportSelected();
     private Airport selectedDestination = new NoAirportSelected();
-    private DateOnly travelDate = DateOnly.FromDateTime(DateTime.Now);
+    private DateOnly travelDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7));
     private List<Flight> matchingFlights = new();
     private bool loading = false;
 
