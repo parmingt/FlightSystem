@@ -2,6 +2,7 @@
 @using FlightSystem.Services
 @using FlightSystem.UI
 @using FlightSystem.Services.Models
+@using Microsoft.AspNetCore.WebUtilities
 @inject AirportsService airportsService
 @inject FlightSearchService flightSearchService
 @inject BookingService bookingService
@@ -95,6 +96,7 @@ else
         if (airport is null)
             matchingFlights = new();
         selectedOrigin = airport ?? new NoAirportSelected();
+        UpdateUriOnSelectionChange();
     }
 
     private void OnDestinationChanged(Airport airport)
@@ -102,6 +104,7 @@ else
         if (airport is null)
             matchingFlights = new();
         selectedDestination = airport ?? new NoAirportSelected();
+        UpdateUriOnSelectionChange();
     }
 
     private async Task SearchFlights()
@@ -121,6 +124,16 @@ else
     {
         await bookingService.BookFlight(args.Item);
         NavigationManager.NavigateTo("bookings");
+    }
+
+    private void UpdateUriOnSelectionChange()
+    {
+        var query = new Dictionary<string, string> { 
+            { "origin", selectedOrigin.Code.ToString() },
+            { "destination", selectedDestination.Code.ToString() }
+        };
+        NavigationManager.NavigateTo(
+            QueryHelpers.AddQueryString(NavigationManager.Uri.Split('?')[0], query));
     }
 
     protected record NoAirportSelected : Airport {
