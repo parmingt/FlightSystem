@@ -3,6 +3,7 @@
 @using FlightSystem.UI
 @using FlightSystem.Services.Models
 @using Microsoft.AspNetCore.WebUtilities
+@using System.Web
 @inject AirportsService airportsService
 @inject FlightSearchService flightSearchService
 @inject BookingService bookingService
@@ -89,6 +90,26 @@ else
             Data = airports,
             TotalCount = airports.Count
         });
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var initialCodes = HttpUtility.ParseQueryString((new Uri(NavigationManager.Uri)).Query);
+        var originCode = initialCodes["origin"];
+        if (!string.IsNullOrWhiteSpace(originCode))
+        {
+            var selection = await airportsService.SearchAirportsAsync(originCode);
+            selectedOrigin = selection.FirstOrDefault() ?? new NoAirportSelected();
+            originSearchText = originCode;
+        }
+
+        var destinationCode = initialCodes["destination"];
+        if (!string.IsNullOrWhiteSpace(destinationCode))
+        {
+            var selection = await airportsService.SearchAirportsAsync(destinationCode);
+            selectedDestination = selection.FirstOrDefault() ?? new NoAirportSelected();
+            destinationSearchText = destinationCode;
+        }
     }
 
     private void OnOriginChanged(Airport airport)
