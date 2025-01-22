@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using AmadeusSDK.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyModel;
 using System.Reflection;
 using static AmadeusSDK.Models.OffersSearch;
@@ -38,6 +39,42 @@ public sealed class IntegrationTests
 
         var offers = new List<Offers> { flights.First() };
         var confirmation = await client.ConfirmFlightOffer(offers);
+
+        Assert.IsTrue(confirmation.Any());
+        Assert.IsTrue(flights.First().price.total == confirmation.First().price.total);
+    }
+
+    [TestMethod]
+    public async Task BookFlight()
+    {
+        using var serviceProvider = TestHelpers.BuildServiceCollection().BuildServiceProvider();
+        using var scope = serviceProvider.CreateScope();
+        var client = serviceProvider.GetRequiredService<AmadeusClient>();
+
+        var origin = "EWR";
+        var destination = "SLC";
+
+        var flights = await client.SearchFlightsAsync(origin, destination, DateTime.Now);
+
+        var order = new FlightOrder()
+        {
+            FlightOffers = new List<Offers> { flights.First() },
+            Travelers = new List<Traveler>()
+            {
+                new Traveler()
+                {
+                    id = "1",
+                    dateOfBirth = "10/28/1990",
+                    name = new Name()
+                    {
+                        firstName = "Peter",
+                        lastName = "Armington"
+                    },
+                    gender = "Male"
+                }
+            }
+        };
+        var confirmation = await client.BookFlight(order);
 
         Assert.IsTrue(confirmation.Any());
         Assert.IsTrue(flights.First().price.total == confirmation.First().price.total);
