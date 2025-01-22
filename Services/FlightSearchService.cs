@@ -32,7 +32,8 @@ public class FlightSearchService
 
     public async Task<bool> ConfirmFlight(Flight flight)
     {
-        if (!memoryCache.TryGetValue(("offers", flight), out OffersSearch.Offers cachedOffer))
+        if (!memoryCache.TryGetValue(("offers", flight), out OffersSearch.Offers? cachedOffer)
+                || cachedOffer is null)
             return false;
 
         var confirmation = await routesClient.ConfirmFlightOffer(new List<OffersSearch.Offers> { cachedOffer });
