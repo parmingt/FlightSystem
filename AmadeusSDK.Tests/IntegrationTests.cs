@@ -54,11 +54,12 @@ public sealed class IntegrationTests
         var origin = "EWR";
         var destination = "SLC";
 
-        var flights = await client.SearchFlightsAsync(origin, destination, DateTime.Now);
+        var flights = await client.SearchFlightsAsync(origin, destination, DateTime.Now.AddDays(1));
 
+        var confirmedOffer = await client.ConfirmFlightOffer([flights[2]]);
         var order = new FlightOrder()
         {
-            flightOffers = new List<Offers> { flights.First() },
+            flightOffers = new List<Offers> { confirmedOffer.First() },
             travelers = new List<Traveler>()
             {
                 new Traveler()

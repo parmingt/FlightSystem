@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AmadeusSDK.Models;
@@ -139,6 +140,8 @@ public class OffersSearch
         public string segmentId { get; set; }
         public string cabin { get; set; }
         public string fareBasis { get; set; }
+
+        [JsonPropertyName("class")]
         public string _class { get; set; }
         public Includedcheckedbags includedCheckedBags { get; set; }
         public string brandedFare { get; set; }
