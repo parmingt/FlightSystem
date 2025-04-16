@@ -67,11 +67,11 @@ public class AmadeusClient
         var endpoint = $"v1/booking/flight-orders";
 
         var request = new DataWrapper<FlightOrder>(order);
-
+        var requestJson = JsonSerializer.Serialize(request);
         var response = await client.PostAsJsonAsync(endpoint, request);
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<DataWrapper<FlightOrder>>(json);
-        return confirmedOffers.data.FlightOffers;
+        return confirmedOffers.data.flightOffers;
     }
 
     public async Task<string> GetTokenAsync()

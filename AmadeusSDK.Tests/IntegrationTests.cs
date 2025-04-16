@@ -58,19 +58,30 @@ public sealed class IntegrationTests
 
         var order = new FlightOrder()
         {
-            FlightOffers = new List<Offers> { flights.First() },
-            Travelers = new List<Traveler>()
+            flightOffers = new List<Offers> { flights.First() },
+            travelers = new List<Traveler>()
             {
                 new Traveler()
                 {
                     id = "1",
-                    dateOfBirth = "10/28/1990",
+                    dateOfBirth = "1990-10-28",
                     name = new Name()
                     {
                         firstName = "Peter",
                         lastName = "Armington"
                     },
-                    gender = "Male"
+                    gender = "MALE",
+                    contact = new Contact()
+                    {
+                        emailAddress = "jorge.gonzales833@telefonica.es",
+                        phones = [
+                            new Phone() {
+                                deviceType = "MOBILE",
+                                countryCallingCode = "34",
+                                number = "480080076"
+                            }
+                        ]
+                    }
                 }
             }
         };
