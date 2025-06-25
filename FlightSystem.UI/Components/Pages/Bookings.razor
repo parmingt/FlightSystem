@@ -10,12 +10,12 @@
     <Grid TItem="BookedFlight"
           Class="table table-hover table-bordered table-striped"
           Data="bookings"
-          AllowFiltering="true"
           Responsive="true"
+          AllowSorting="true"
           AllowRowClick="true">
 
         <GridColumns>
-            <GridColumn TItem="BookedFlight" HeaderText="Origin">
+            <GridColumn TItem="BookedFlight" HeaderText="Origin" SortKeySelector="item => item.Flight.Segments.FirstOrDefault().Origin.ToString()">
                 @context.Flight.Segments?.FirstOrDefault()?.Origin.ToString()
             </GridColumn>
             <GridColumn TItem="BookedFlight" HeaderText="Destination">

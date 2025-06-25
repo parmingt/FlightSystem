@@ -56,6 +56,12 @@ public class AmadeusClient
         };
 
         var response = await client.PostAsJsonAsync(endpoint, request);
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            throw new Exception($"Error confirming flight offers: {errorContent}");
+        }
+
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<PricingConfirmation>(json);
         return confirmedOffers.data.flightOffers;
