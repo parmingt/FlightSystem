@@ -42,13 +42,14 @@ public class BookingService
                 Total = selectedFlight.Price.Total,
                 Currency = context.Currency.First(c => c.Name == selectedFlight.Price.Currency)
             },
-            Status = context.BookingStatus.First(s => s.Name == "Pending")
+            Status = context.BookingStatus.First(s => s.Name == "Pending"),
+            BookingDate = DateTime.UtcNow
         };
         context.Bookings.Add(newBooking);
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<Flight>> GetBookings()
+    public async Task<List<BookedFlight>> GetBookings()
     {
         var bookings = await context.Bookings
             .Include(b => b.Segments).ThenInclude(s => s.Origin)
@@ -60,7 +61,7 @@ public class BookingService
             return new();
 
         return bookings.Select(b => 
-            new Flight(
+            new BookedFlight(new Flight(
                 b.Segments.First().Departure,
                 new Models.Price(b.Price.Total, b.Price.Currency.Name),
                 b.Segments.Select(s => 
@@ -68,7 +69,7 @@ public class BookingService
                         , new IataCode(s.Origin.Code)
                         , new IataCode(s.Destination.Code), s.Departure)
                     ).ToList() 
-                , ""))
+                , ""), b.BookingDate))
             .ToList();
     }
 }

@@ -58,6 +58,7 @@ public class Booking
 
     public required ICollection<Segment> Segments { get; set; }
     public required BookingStatus Status { get; set; }
+    public required DateTime BookingDate { get; set; } = DateTime.MinValue;
 }
 
 public class Price

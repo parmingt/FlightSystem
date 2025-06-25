@@ -1,12 +1,13 @@
 ﻿@page "/bookings"
 @using FlightSystem.Services
 @using FlightSystem.Services.Models
+@using BlazorBootstrap
 @inject BookingService bookingService
 
 <h3>Bookings</h3>
 @if (!loading)
 {
-    <Grid TItem="Flight"
+    <Grid TItem="BookedFlight"
           Class="table table-hover table-bordered table-striped"
           Data="bookings"
           AllowFiltering="true"
@@ -14,17 +15,20 @@
           AllowRowClick="true">
 
         <GridColumns>
-            <GridColumn TItem="Flight" HeaderText="Origin">
-                @context.Segments?.FirstOrDefault()?.Origin.ToString()
+            <GridColumn TItem="BookedFlight" HeaderText="Origin">
+                @context.Flight.Segments?.FirstOrDefault()?.Origin.ToString()
             </GridColumn>
-            <GridColumn TItem="Flight" HeaderText="Destination">
-                @context.Segments?.LastOrDefault()?.Destination.ToString()
+            <GridColumn TItem="BookedFlight" HeaderText="Destination">
+                @context.Flight.Segments?.LastOrDefault()?.Destination.ToString()
             </GridColumn>
-            <GridColumn TItem="Flight" HeaderText="Date">
-                @context.Segments?.FirstOrDefault()?.Departure
+            <GridColumn TItem="BookedFlight" HeaderText="Departure">
+                @context.Flight.Segments?.FirstOrDefault()?.Departure
             </GridColumn>
-            <GridColumn TItem="Flight" HeaderText="Price">
-                @context.Price.Total @context.Price.Currency
+            <GridColumn TItem="BookedFlight" HeaderText="Booked On">
+                @context.BookingDate
+            </GridColumn>
+            <GridColumn TItem="BookedFlight" HeaderText="Price">
+                @context.Flight.Price.Total @context.Flight.Price.Currency
             </GridColumn>
         </GridColumns>
 
@@ -37,7 +41,7 @@ else
 
 @code {
     private bool loading = true;
-    private List<Flight> bookings = new();
+    private List<BookedFlight> bookings = new();
 
     protected override async Task OnInitializedAsync()
     {
