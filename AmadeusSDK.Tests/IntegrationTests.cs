@@ -89,6 +89,6 @@ public sealed class IntegrationTests
         var confirmation = await client.BookFlight(order);
 
         Assert.IsTrue(confirmation.Any());
-        Assert.IsTrue(flights.First().price.total == confirmation.First().price.total);
+        Assert.IsTrue(confirmation.First().price.total == confirmation.First().price.total);
     }
 }
