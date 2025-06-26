@@ -29,6 +29,8 @@ public class BookingService
             return;
         }
 
+        var booked = await flightSearchService.BookFlight(selectedFlight);
+
         var newBooking = new Data.Booking()
         {
             Segments = selectedFlight.Segments.Select(s => new Data.Segment
@@ -43,7 +45,7 @@ public class BookingService
                 Currency = context.Currency.First(c => c.Name == selectedFlight.Price.Currency)
             },
             Status = context.BookingStatus.First(s => s.Name == "Pending"),
-            BookingDate = DateTime.UtcNow
+            BookingDate = booked.BookingDate
         };
         context.Bookings.Add(newBooking);
         await context.SaveChangesAsync();
