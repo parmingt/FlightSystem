@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" Version="2.10.1" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
   </ItemGroup>
@@ -14,6 +15,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AmadeusSDK\AmadeusSDK.csproj" />
     <ProjectReference Include="..\FlightSystem.Data\FlightSystem.Data.csproj" />
+    <ProjectReference Include="..\FlightSystem.Kafka\FlightSystem.Kafka.csproj" />
   </ItemGroup>
 
 </Project>

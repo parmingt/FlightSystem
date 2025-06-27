@@ -9,6 +9,8 @@
 
   <ItemGroup>
     <PackageReference Include="Blazor.Bootstrap" Version="3.3.1" />
+    <PackageReference Include="Confluent.SchemaRegistry" Version="2.10.1" />
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes.Json" Version="2.10.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -17,6 +19,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FlightSystem.Data\FlightSystem.Data.csproj" />
+    <ProjectReference Include="..\FlightSystem.Kafka\FlightSystem.Kafka.csproj" />
     <ProjectReference Include="..\Services\FlightSystem.Services.csproj" />
   </ItemGroup>
 

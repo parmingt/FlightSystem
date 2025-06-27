@@ -35,7 +35,7 @@ public class AmadeusClient
     {
         var client = await GetClientWithTokenAsync();
         var formattedDate = departure.ToString("yyyy-MM-dd");
-        var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}";
+        var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}&currencyCode=USD";
         var response = await client.GetAsync(endpoint);
         var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
         return offers!.data.ToList();

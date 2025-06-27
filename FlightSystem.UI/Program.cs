@@ -1,8 +1,13 @@
 using AmadeusSDK;
+using Confluent.Kafka;
+using Confluent.SchemaRegistry;
+using Confluent.SchemaRegistry.Serdes;
 using FlightSystem.Data;
 using FlightSystem.Services;
 using FlightSystem.UI.Components;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using FlightSystem.Kafka.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBlazorBootstrap();
@@ -21,6 +26,24 @@ builder.Services.AddAmadeusClient(builder.Configuration["Amadeus:ClientId"], bui
 builder.Services.AddScoped<AirportsService>();
 builder.Services.AddScoped<FlightSearchService>();
 builder.Services.AddScoped<BookingService>();
+
+builder.Services.Configure<SchemaRegistryConfig>(builder.Configuration.GetSection("SchemaRegistry"));
+builder.Services.AddSingleton<ISchemaRegistryClient>(sp =>
+{
+    var config = sp.GetRequiredService<IOptions<SchemaRegistryConfig>>();
+    return new CachedSchemaRegistryClient(config.Value);
+});
+builder.Services.AddSingleton(services =>
+{
+    var config = new ProducerConfig
+    {
+        BootstrapServers = builder.Configuration["Kafka:BootstrapServers"]
+    };
+
+    var schemaRegistry = services.GetRequiredService<ISchemaRegistryClient>();
+    return new ProducerBuilder<string, FlightOrder>(config)
+        .SetValueSerializer(new JsonSerializer<FlightOrder>(schemaRegistry)).Build();
+});
 
 var app = builder.Build();
 
