@@ -85,14 +85,14 @@ public class OffersSearch
     public class Departure
     {
         public string iataCode { get; set; }
-        public string terminal { get; set; }
+        public string? terminal { get; set; }
         public DateTime at { get; set; }
     }
 
     public class Arrival
     {
         public string iataCode { get; set; }
-        public string terminal { get; set; }
+        public string? terminal { get; set; }
         public DateTime at { get; set; }
     }
 

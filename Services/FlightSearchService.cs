@@ -14,10 +14,10 @@ public class FlightSearchService
 {
     private readonly AmadeusClient routesClient;
     private readonly IMemoryCache memoryCache;
-    private readonly IProducer<string, Kafka.Models.FlightOrder> producer;
+    private readonly IProducer<string, FlightOrder> producer;
 
     public FlightSearchService(AmadeusClient routesClient, IMemoryCache memoryCache,
-        IProducer<string, Kafka.Models.FlightOrder> producer)
+        IProducer<string, FlightOrder> producer)
     {
         this.routesClient = routesClient;
         this.memoryCache = memoryCache;
