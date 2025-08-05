@@ -3,6 +3,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
@@ -37,8 +38,23 @@ public class AmadeusClient
         var formattedDate = departure.ToString("yyyy-MM-dd");
         var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}&currencyCode=USD";
         var response = await client.GetAsync(endpoint);
-        var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
-        return offers!.data.ToList();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Debug.WriteLine($"Error fetching flight offers: {response.StatusCode} - {response.ReasonPhrase}");
+            return [];
+        }
+
+        try
+        {
+            var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
+            return offers!.data.ToList();
+        }
+        catch (Exception)
+        {
+            Debug.WriteLine($"Error deserializing response: {response.Content.ToString()}");
+            throw;
+        }
     }
 
     public async Task<List<Offers>> ConfirmFlightOffer(List<Offers> offersToConfirm)

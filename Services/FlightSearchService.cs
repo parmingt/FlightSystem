@@ -62,9 +62,7 @@ public class FlightSearchService
             Key = "flight-order",
             Value = order
         });
-        //var bookedOffers = await routesClient.BookFlight(order);
-        //var firstOffer = bookedOffers.First();
-        //var bookedFlight = firstOffer.ToFlight();
+
         return new BookedFlight(flight, DateTime.UtcNow);
     }
 }

@@ -100,16 +100,20 @@ else
         if (!string.IsNullOrWhiteSpace(originCode))
         {
             var selection = await airportsService.SearchAirportsAsync(originCode);
-            selectedOrigin = selection.FirstOrDefault() ?? new NoAirportSelected();
-            originSearchText = originCode;
+            selectedOrigin = selection
+                .FirstOrDefault(a => a.Code.Value.Equals(originCode, StringComparison.OrdinalIgnoreCase)) 
+                ?? new NoAirportSelected();
+            originSearchText = selectedOrigin.Name;
         }
 
         var destinationCode = initialCodes["destination"];
         if (!string.IsNullOrWhiteSpace(destinationCode))
         {
             var selection = await airportsService.SearchAirportsAsync(destinationCode);
-            selectedDestination = selection.FirstOrDefault() ?? new NoAirportSelected();
-            destinationSearchText = destinationCode;
+            selectedDestination = selection
+                .FirstOrDefault(a => a.Code.Value.Equals(destinationCode, StringComparison.OrdinalIgnoreCase)) 
+                ?? new NoAirportSelected();
+            destinationSearchText = selectedDestination.Name;
         }
     }
 
