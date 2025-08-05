@@ -84,14 +84,14 @@ public class OffersSearch
 
     public class Departure
     {
-        public string iataCode { get; set; }
+        public required string iataCode { get; set; }
         public string? terminal { get; set; }
         public DateTime at { get; set; }
     }
 
     public class Arrival
     {
-        public string iataCode { get; set; }
+        public required string iataCode { get; set; }
         public string? terminal { get; set; }
         public DateTime at { get; set; }
     }
@@ -103,7 +103,7 @@ public class OffersSearch
 
     public class Operating
     {
-        public string carrierCode { get; set; }
+        public string? carrierCode { get; set; }
     }
 
     public class Stop

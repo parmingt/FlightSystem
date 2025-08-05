@@ -52,7 +52,11 @@ public class FlightSearchService
             throw new Exception("Flight offer not found in cache.");
 
         string jsonString = JsonSerializer.Serialize(cachedOffer);
-        var kafkaOffer = JsonSerializer.Deserialize<Kafka.Models.OffersSearch.Offers>(jsonString);
+        var kafkaOffer = JsonSerializer.Deserialize<Kafka.Models.OffersSearch.Offers>(jsonString
+            , new JsonSerializerOptions()
+            {
+                RespectNullableAnnotations = true
+            });
         var order = new FlightOrder()
         {
             flightOffers = [kafkaOffer]

@@ -49,7 +49,7 @@ public class OffersSearch
     {
         public string currency { get; set; }
         public string total { get; set; }
-        public string _base { get; set; }
+        public string? _base { get; set; }
         public Fee[] fees { get; set; }
         public string grandTotal { get; set; }
     }
@@ -84,20 +84,20 @@ public class OffersSearch
         public string id { get; set; }
         public int numberOfStops { get; set; }
         public bool blacklistedInEU { get; set; }
-        public Stop[] stops { get; set; }
+        public Stop[]? stops { get; set; }
     }
 
     public class Departure
     {
         public string iataCode { get; set; }
-        public string terminal { get; set; }
+        public string? terminal { get; set; }
         public DateTime at { get; set; }
     }
 
     public class Arrival
     {
         public string iataCode { get; set; }
-        public string terminal { get; set; }
+        public string? terminal { get; set; }
         public DateTime at { get; set; }
     }
 
