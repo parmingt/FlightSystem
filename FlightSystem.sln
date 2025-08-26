@@ -21,6 +21,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AmadeusSDK.Tests", "Amadeus
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSystem.Kafka", "FlightSystem.Kafka\FlightSystem.Kafka.csproj", "{B4A751E7-F5BC-4E92-B9E8-362EFAC5E960}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSystem.BookingListener", "FlightSystem.BookingListener\FlightSystem.BookingListener.csproj", "{FFB6009D-DC41-4667-BDFD-B2386E920DE2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{B4A751E7-F5BC-4E92-B9E8-362EFAC5E960}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B4A751E7-F5BC-4E92-B9E8-362EFAC5E960}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B4A751E7-F5BC-4E92-B9E8-362EFAC5E960}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFB6009D-DC41-4667-BDFD-B2386E920DE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFB6009D-DC41-4667-BDFD-B2386E920DE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFB6009D-DC41-4667-BDFD-B2386E920DE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFB6009D-DC41-4667-BDFD-B2386E920DE2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
