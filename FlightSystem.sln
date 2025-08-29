@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSystem.Kafka", "Fligh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSystem.BookingListener", "FlightSystem.BookingListener\FlightSystem.BookingListener.csproj", "{FFB6009D-DC41-4667-BDFD-B2386E920DE2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlightSystem.BookingListener.Tests", "FlightSystem.BookingListener.Tests\FlightSystem.BookingListener.Tests.csproj", "{CD4B8816-D6EE-4C2F-9875-260F80B4EE58}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +71,10 @@ Global
 		{FFB6009D-DC41-4667-BDFD-B2386E920DE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FFB6009D-DC41-4667-BDFD-B2386E920DE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FFB6009D-DC41-4667-BDFD-B2386E920DE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD4B8816-D6EE-4C2F-9875-260F80B4EE58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD4B8816-D6EE-4C2F-9875-260F80B4EE58}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD4B8816-D6EE-4C2F-9875-260F80B4EE58}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD4B8816-D6EE-4C2F-9875-260F80B4EE58}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
