@@ -1,16 +1,22 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Confluent.Kafka;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Configuration.Json;
 
-Console.WriteLine("Hello, World!");
+var configuration = new ConfigurationBuilder()
+     .AddJsonFile($"appsettings.json");
 
-var config = new ConsumerConfig
+var config = configuration.Build();
+
+var consumerConfig = new ConsumerConfig
 {
-    BootstrapServers = "localhost:19092",
+    BootstrapServers = config
+        .GetRequiredSection("Kafka")["BootstrapServers"],
     GroupId = "booking-engine",
     AutoOffsetReset = AutoOffsetReset.Earliest
 };
 
-using (var consumer = new ConsumerBuilder<Ignore, string>(config).Build())
+using (var consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
 {
     consumer.Subscribe("flight-orders");
     while (true)
