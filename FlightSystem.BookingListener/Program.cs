@@ -1,31 +1,20 @@
-﻿// See https://aka.ms/new-console-template for more information
-using Confluent.Kafka;
+﻿using Confluent.Kafka;
+using FlightSystem.BookingListener;
+using FlightSystem.Kafka.Models;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.Json;
+using Microsoft.Extensions.DependencyInjection;
 
-var configuration = new ConfigurationBuilder()
-     .AddJsonFile($"appsettings.json");
+IConfiguration configuration = new ConfigurationBuilder()
+     .AddJsonFile($"appsettings.json").Build();
 
-var config = configuration.Build();
+var serviceProvider = new ServiceCollection()
+    .AddLogging()
+    .AddSingleton<BookingListener>()
+    .AddSingleton(_ => {
+        var kafkaConfig = new KafkaConfiguration();
+        configuration.Bind("Kafka", kafkaConfig);
+        return kafkaConfig;
+    })
+    .BuildServiceProvider();
 
-var consumerConfig = new ConsumerConfig
-{
-    BootstrapServers = config
-        .GetRequiredSection("Kafka")["BootstrapServers"],
-    GroupId = "booking-engine",
-    AutoOffsetReset = AutoOffsetReset.Earliest
-};
-
-using (var consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
-{
-    consumer.Subscribe("flight-orders");
-    while (true)
-    {
-        var consumeResult = consumer.Consume();
-        Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Message.Value}");
-        // Simulate processing the booking
-        Console.WriteLine("Processing booking...");
-        Thread.Sleep(2000); // Simulate some work
-        Console.WriteLine("Booking processed.");
-    }
-}
+serviceProvider.GetRequiredService<BookingListener>().Run();
