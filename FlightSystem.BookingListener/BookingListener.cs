@@ -8,29 +8,19 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.BookingListener;
 
-public class BookingListener(KafkaConfiguration kafkaConfiguration)
+public class BookingListener(IConsumer<string, FlightOrder> consumer)
 {
     public void Run()
     {
-        var consumerConfig = new ConsumerConfig
+        consumer.Subscribe("flight-orders");
+        while (true)
         {
-            BootstrapServers = kafkaConfiguration.BootstrapServers,
-            GroupId = "booking-engine",
-            AutoOffsetReset = AutoOffsetReset.Earliest
-        };
-
-        using (var consumer = new ConsumerBuilder<Ignore, string>(consumerConfig).Build())
-        {
-            consumer.Subscribe("flight-orders");
-            while (true)
-            {
-                var consumeResult = consumer.Consume();
-                Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Message.Value}");
-                // Simulate processing the booking
-                Console.WriteLine("Processing booking...");
-                Thread.Sleep(2000); // Simulate some work
-                Console.WriteLine("Booking processed.");
-            }
+            var consumeResult = consumer.Consume();
+            Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Message.Value}");
+            // Simulate processing the booking
+            Console.WriteLine("Processing booking...");
+            Thread.Sleep(2000); // Simulate some work
+            Console.WriteLine("Booking processed.");
         }
     }
 }

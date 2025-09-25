@@ -42,7 +42,8 @@ public class FlightSearchService
             return false;
 
         var confirmation = await routesClient.ConfirmFlightOffer(new List<AmadeusSDK.Models.OffersSearch.Offers> { cachedOffer });
-        return confirmation.First().price.total == cachedOffer.price.total;
+        return confirmation.Any();
+        // return confirmation.First().price.total == cachedOffer.price.total;
     }
 
     public async Task<BookedFlight> BookFlight(Flight flight)
