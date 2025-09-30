@@ -43,7 +43,7 @@
 @if (!loading)
 {    
     <Grid 
-          TItem="Flight"
+          TItem="FlightOffer"
           Class="table table-hover table-bordered table-striped"
           Data ="matchingFlights"
           AllowFiltering="true"
@@ -52,16 +52,16 @@
           OnRowClick="OnRowClick">
 
         <GridColumns>
-            <GridColumn TItem="Flight" HeaderText="Origin" SortKeySelector="item => item.Origin.ToString()">
+            <GridColumn TItem="FlightOffer" HeaderText="Origin" SortKeySelector="item => item.Origin.ToString()">
                 @context.Origin
             </GridColumn>
-            <GridColumn TItem="Flight" HeaderText="Destination" SortKeySelector="item => item.Destination.ToString()">
+            <GridColumn TItem="FlightOffer" HeaderText="Destination" SortKeySelector="item => item.Destination.ToString()">
                 @context.Destination
             </GridColumn>
-            <GridColumn TItem="Flight" HeaderText="Date" SortKeySelector="item => item.Date">
+            <GridColumn TItem="FlightOffer" HeaderText="Date" SortKeySelector="item => item.Date">
                 @context.Date
             </GridColumn>
-            <GridColumn TItem="Flight" HeaderText="Cost">
+            <GridColumn TItem="FlightOffer" HeaderText="Cost">
                 @context.Price
             </GridColumn>
         </GridColumns>
@@ -79,7 +79,7 @@ else
     private Airport selectedOrigin = new NoAirportSelected();
     private Airport selectedDestination = new NoAirportSelected();
     private DateOnly travelDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7));
-    private List<Flight> matchingFlights = new();
+    private List<FlightOffer> matchingFlights = new();
     private bool loading = false;
 
     private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
@@ -146,7 +146,7 @@ else
         loading = false;
     }
 
-    private async Task OnRowClick(GridRowEventArgs<Flight> args)
+    private async Task OnRowClick(GridRowEventArgs<FlightOffer> args)
     {
         await bookingService.BookFlight(args.Item);
         NavigationManager.NavigateTo("bookings");

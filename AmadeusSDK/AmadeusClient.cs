@@ -47,6 +47,8 @@ public class AmadeusClient
 
         try
         {
+            var raw = await response.Content.ReadAsStringAsync();
+            Console.WriteLine(raw);
             var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
             return offers!.data.ToList();
         }

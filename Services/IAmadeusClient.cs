@@ -4,5 +4,5 @@ namespace FlightSystem.Services;
 
 public interface IAmadeusClient
 {
-    Task<List<Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateTime departure, int numAdults = 1);
+    Task<List<FlightOffer>> SearchFlightsAsync(IataCode origin, IataCode destination, DateTime departure, int numAdults = 1);
 }

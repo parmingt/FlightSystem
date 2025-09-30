@@ -19,7 +19,7 @@ public class BookingService
         this.context = context;
         this.flightSearchService = flightSearchService;
     }
-    public async Task BookFlight(Flight selectedFlight)
+    public async Task BookFlight(FlightOffer selectedFlight)
     {
         var confirmed = await flightSearchService.ConfirmFlight(selectedFlight);
 
@@ -63,7 +63,7 @@ public class BookingService
             return new();
 
         return bookings.Select(b => 
-            new BookedFlight(new Flight(
+            new BookedFlight(new FlightOffer(
                 b.Segments.First().Departure,
                 new Models.Price(b.Price.Total, b.Price.Currency.Name),
                 b.Segments.Select(s => 
@@ -71,7 +71,7 @@ public class BookingService
                         , new IataCode(s.Origin.Code)
                         , new IataCode(s.Destination.Code), s.Departure)
                     ).ToList() 
-                , ""), b.BookingDate))
+                , "", []), b.BookingDate))
             .ToList();
     }
 }

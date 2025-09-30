@@ -2,7 +2,12 @@
 
 namespace FlightSystem.Services.Models;
 
-public record Flight(DateTime Date, Price Price, List<Segment> Segments, string offerId)
+public record FlightOffer(
+    DateTime Date, 
+    Price Price, 
+    List<Segment> Segments, 
+    string offerId,
+    List<TravelerPricing> TravelerPricings)
 {
     public IataCode Origin => Segments.First().Origin;
     public IataCode Destination => Segments.Last().Destination;

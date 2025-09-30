@@ -6,4 +6,6 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.Services.Models;
 
-public record BookedFlight(FlightOffer Flight, DateTime BookingDate);
+public record TravelerPricing(string TravelerId, string FareOption, string TravelerType, Price Price, List<FareDetailBySegment> FareDetails)
+{
+}

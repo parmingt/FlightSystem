@@ -24,7 +24,7 @@ public class FlightSearchService
         this.producer = producer;
     }
 
-    public async Task<List<Models.Flight>> SearchFlightsAsync(IataCode origin, IataCode destination, DateOnly travelDate)
+    public async Task<List<Models.FlightOffer>> SearchFlightsAsync(IataCode origin, IataCode destination, DateOnly travelDate)
     {
         var offers = await routesClient.SearchFlightsAsync(origin.ToString(), destination.ToString(), travelDate.ToDateTime(TimeOnly.MinValue));
         var flights = offers.Select(o => {
@@ -35,17 +35,18 @@ public class FlightSearchService
         return flights;
     }
 
-    public async Task<bool> ConfirmFlight(Flight flight)
+    public async Task<bool> ConfirmFlight(FlightOffer flight)
     {
-        if (!memoryCache.TryGetValue(("offers", flight), out AmadeusSDK.Models.OffersSearch.Offers? cachedOffer)
-                || cachedOffer is null)
-            return false;
+        //if (!memoryCache.TryGetValue(("offers", flight), out AmadeusSDK.Models.OffersSearch.Offers? cachedOffer)
+        //        || cachedOffer is null)
+        //    return false;
 
-        var confirmation = await routesClient.ConfirmFlightOffer(new List<AmadeusSDK.Models.OffersSearch.Offers> { cachedOffer });
-        return confirmation.First().price.total == cachedOffer.price.total;
+        var amadeusOffer = flight.ToOffer();
+        var confirmation = await routesClient.ConfirmFlightOffer(new List<AmadeusSDK.Models.OffersSearch.Offers> { amadeusOffer });
+        return confirmation.First().price.total == amadeusOffer.price.total;
     }
 
-    public async Task<BookedFlight> BookFlight(Flight flight)
+    public async Task<BookedFlight> BookFlight(FlightOffer flight)
     {
         if (!memoryCache.TryGetValue(("offers", flight), out AmadeusSDK.Models.OffersSearch.Offers? cachedOffer)
                 || cachedOffer is null)
