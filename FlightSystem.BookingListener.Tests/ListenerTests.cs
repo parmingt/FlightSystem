@@ -1,4 +1,9 @@
 ﻿using Confluent.Kafka;
+using Confluent.SchemaRegistry;
+using Confluent.SchemaRegistry.Serdes;
+using FlightSystem.Kafka.Models;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.Kafka;
 
 namespace FlightSystem.BookingListener.Tests;
@@ -6,11 +11,19 @@ namespace FlightSystem.BookingListener.Tests;
 [TestClass]
 public sealed class ListenerTests
 {
-    private IProducer<Null, string> _producer;
+    private IProducer<string, FlightOrder> _producer;
 
     [TestMethod]
     public async Task ConsumesMessage()
     {
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json").Build();
+        var serviceProvider = new ServiceCollection()
+            .AddLogging()
+            .AddSingleton<BookingListener>()
+            .AddBookingConsumer(configuration)
+            .BuildServiceProvider();
+
         var kafkaContainer = new KafkaBuilder()
           .WithImage("confluentinc/cp-kafka:6.2.10")
           .WithPortBinding(9092)
@@ -18,23 +31,27 @@ public sealed class ListenerTests
         await kafkaContainer.StartAsync();
 
         var bootstrapServers = kafkaContainer.GetBootstrapAddress();
-        _producer = new ProducerBuilder<Null, string>(new ProducerConfig
+        var schemaRegistry = serviceProvider.GetRequiredService<ISchemaRegistryClient>();
+        _producer = new ProducerBuilder<string, FlightOrder>(new ProducerConfig
         {
             BootstrapServers = bootstrapServers
-        }).Build();
-        await _producer.ProduceAsync("test-topic", new Message<Null, string>()
+        }).SetValueSerializer(new JsonSerializer<FlightOrder>(schemaRegistry))
+        .Build();
+        await _producer.ProduceAsync("flight-orders", new Message<string, FlightOrder>()
         {
-            Value = "Hello"
+            Key = "flight-order",
+            Value = new FlightOrder()
+            {
+                flightOffers = Array.Empty<OffersSearch.Offers>()
+            }
         });
 
-        var consumer = new ConsumerBuilder<Null, string>(new ConsumerConfig
-        {
-            BootstrapServers = bootstrapServers,
-            GroupId = Guid.NewGuid().ToString(),
-            AutoOffsetReset = AutoOffsetReset.Earliest
-        }).Build();
-        consumer.Subscribe("test-topic");
-        var message = consumer.Consume();
-        Assert.AreEqual(message.Message.Value, "Hello");
+        var token = new CancellationTokenSource();
+        token.CancelAfter(TimeSpan.FromSeconds(2));
+
+        serviceProvider.GetRequiredService<BookingListener>().Run(token.Token);
+
+        var consumer = serviceProvider.GetRequiredService<IConsumer<string, FlightOrder>>();
+        Assert.IsTrue(consumer.Subscription.Contains("flight-orders"));
     }
 }

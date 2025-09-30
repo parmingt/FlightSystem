@@ -11,34 +11,19 @@ using Microsoft.Extensions.Options;
 IConfiguration configuration = new ConfigurationBuilder()
      .AddJsonFile("appsettings.json").Build();
 
+CancellationTokenSource cts = new CancellationTokenSource();
+
+Console.CancelKeyPress += (sender, eventArgs) =>
+{
+    Console.WriteLine("Cancel event triggered");
+    cts.Cancel();
+    eventArgs.Cancel = true;
+};
+
 var serviceProvider = new ServiceCollection()
     .AddLogging()
     .AddSingleton<BookingListener>()
-    .AddSingleton(_ => {
-        var kafkaConfig = new KafkaConfiguration();
-        configuration.Bind("Kafka", kafkaConfig);
-        return kafkaConfig;
-    })
-    .AddSingleton<ISchemaRegistryClient>(sp =>
-    {
-        var schemaRegistryConfig = new SchemaRegistryConfig();
-        configuration.Bind("SchemaRegistry", schemaRegistryConfig);
-        return new CachedSchemaRegistryClient(schemaRegistryConfig);
-    })
-    .AddSingleton(sp =>
-    {
-        var consumerConfig = new ConsumerConfig
-        {
-            BootstrapServers = sp.GetRequiredService<KafkaConfiguration>().BootstrapServers,
-            GroupId = "booking-engine",
-            AutoOffsetReset = AutoOffsetReset.Earliest
-        };
-
-        var schemaRegistry = sp.GetRequiredService<ISchemaRegistryClient>();
-        var consumerBuilder = new ConsumerBuilder<string, FlightOrder>(consumerConfig);
-        consumerBuilder.SetValueDeserializer(new JsonDeserializer<FlightOrder>(schemaRegistry).AsSyncOverAsync());
-        return consumerBuilder.Build();
-    })
+    .AddBookingConsumer(configuration)
     .BuildServiceProvider();
 
-serviceProvider.GetRequiredService<BookingListener>().Run();
+serviceProvider.GetRequiredService<BookingListener>().Run(cts.Token);

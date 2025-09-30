@@ -10,10 +10,10 @@ namespace FlightSystem.BookingListener;
 
 public class BookingListener(IConsumer<string, FlightOrder> consumer)
 {
-    public void Run()
+    public void Run(CancellationToken cancellationToken)
     {
         consumer.Subscribe("flight-orders");
-        while (true)
+        while (!cancellationToken.IsCancellationRequested)
         {
             var consumeResult = consumer.Consume();
             Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Message.Value}");
