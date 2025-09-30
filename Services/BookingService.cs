@@ -69,9 +69,11 @@ public class BookingService
                 b.Segments.Select(s => 
                     new Models.Segment("test", "11"
                         , new IataCode(s.Origin.Code)
-                        , new IataCode(s.Destination.Code), s.Departure)
+                        , new IataCode(s.Destination.Code)
+                        , s.Departure
+                        , "")
                     ).ToList() 
-                , "", []), b.BookingDate))
+                , "", [], "", []), b.BookingDate))
             .ToList();
     }
 }

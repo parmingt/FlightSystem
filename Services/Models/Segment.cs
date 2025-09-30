@@ -10,4 +10,5 @@ public record Segment(string CarrierCode
     , string Number
     , IataCode Origin
     , IataCode Destination
-    , DateTime Departure);
+    , DateTime Departure
+    , string Id);

@@ -20,10 +20,12 @@ internal static class Extensions
                 , s.number
                 , new IataCode(s.departure.iataCode)
                 , new IataCode(s.arrival.iataCode)
-                , s.departure.at)).ToList()
-            , 
-            offer.id
-            , offer.travelerPricings.Select(t => t.ToTravelerPricing()).ToList()
+                , s.departure.at
+                , s.id)).ToList(), 
+            offer.id, 
+            offer.travelerPricings.Select(t => t.ToTravelerPricing()).ToList(),
+            offer.source,
+            offer.validatingAirlineCodes.ToList()
         );
     }
 
@@ -31,7 +33,8 @@ internal static class Extensions
     {
         return new Offers()
         {
-            id = flight.offerId,
+            type = "flight-offer",
+            id = flight.OfferId,
             price = new AmadeusSDK.Models.OffersSearch.Price
             {
                 total = flight.Price.Total.ToString(),
@@ -53,11 +56,14 @@ internal static class Extensions
                         {
                             iataCode = s.Destination.Value.ToString(),
                             at = s.Departure
-                        }
+                        },
+                        id = s.Id
                     }).ToArray()
                 }
             ],
-            travelerPricings = flight.TravelerPricings.Select(t => t.ToAmadeusTravelerPricing()).ToArray()
+            travelerPricings = flight.TravelerPricings.Select(t => t.ToAmadeusTravelerPricing()).ToArray(),
+            source = flight.Source,
+            validatingAirlineCodes = flight.ValidatingAirlineCodes.ToArray()
         };
     }
 

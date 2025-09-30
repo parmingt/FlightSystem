@@ -6,8 +6,10 @@ public record FlightOffer(
     DateTime Date, 
     Price Price, 
     List<Segment> Segments, 
-    string offerId,
-    List<TravelerPricing> TravelerPricings)
+    string OfferId,
+    List<TravelerPricing> TravelerPricings,
+    string Source,
+    List<string> ValidatingAirlineCodes)
 {
     public IataCode Origin => Segments.First().Origin;
     public IataCode Destination => Segments.Last().Destination;
