@@ -12,13 +12,14 @@ namespace FlightSystem.BookingListener.Tests;
 public sealed class ListenerTests
 {
     private IProducer<string, FlightOrder> _producer;
+    private ServiceProvider _serviceProvider;
 
-    [TestMethod]
-    public async Task ConsumesMessage()
+    [TestInitialize]
+    public async Task Setup()
     {
         IConfiguration configuration = new ConfigurationBuilder()
             .AddJsonFile("appsettings.json").Build();
-        var serviceProvider = new ServiceCollection()
+        _serviceProvider = new ServiceCollection()
             .AddLogging()
             .AddSingleton<BookingListener>()
             .AddBookingConsumer(configuration)
@@ -31,12 +32,17 @@ public sealed class ListenerTests
         await kafkaContainer.StartAsync();
 
         var bootstrapServers = kafkaContainer.GetBootstrapAddress();
-        var schemaRegistry = serviceProvider.GetRequiredService<ISchemaRegistryClient>();
+        var schemaRegistry = _serviceProvider.GetRequiredService<ISchemaRegistryClient>();
         _producer = new ProducerBuilder<string, FlightOrder>(new ProducerConfig
         {
             BootstrapServers = bootstrapServers
         }).SetValueSerializer(new JsonSerializer<FlightOrder>(schemaRegistry))
         .Build();
+    }
+
+    [TestMethod]
+    public async Task ConsumesMessage()
+    {
         await _producer.ProduceAsync("flight-orders", new Message<string, FlightOrder>()
         {
             Key = "flight-order",
@@ -49,9 +55,9 @@ public sealed class ListenerTests
         var token = new CancellationTokenSource();
         token.CancelAfter(TimeSpan.FromSeconds(2));
 
-        serviceProvider.GetRequiredService<BookingListener>().Run(token.Token);
+        _serviceProvider.GetRequiredService<BookingListener>().Run(token.Token);
 
-        var consumer = serviceProvider.GetRequiredService<IConsumer<string, FlightOrder>>();
+        var consumer = _serviceProvider.GetRequiredService<IConsumer<string, FlightOrder>>();
         Assert.IsTrue(consumer.Subscription.Contains("flight-orders"));
     }
 }
