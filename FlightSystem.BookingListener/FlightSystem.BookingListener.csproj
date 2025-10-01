@@ -5,6 +5,7 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <UserSecretsId>43a3bcc7-ddd5-468e-b2af-60689ec01d3f</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,10 +15,12 @@
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="8.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.9" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\AmadeusSDK\AmadeusSDK.csproj" />
     <ProjectReference Include="..\FlightSystem.Kafka\FlightSystem.Kafka.csproj" />
     <ProjectReference Include="..\Services\FlightSystem.Services.csproj" />
   </ItemGroup>

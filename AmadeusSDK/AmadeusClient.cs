@@ -17,7 +17,7 @@ using static AmadeusSDK.Models.OffersSearch;
 
 namespace AmadeusSDK;
 
-public class AmadeusClient
+public class AmadeusClient : IAmadeusClient
 {
     private readonly HttpClient httpClient;
     private readonly string clientId;

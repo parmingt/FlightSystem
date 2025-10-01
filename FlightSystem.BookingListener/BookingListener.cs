@@ -1,5 +1,7 @@
-﻿using Confluent.Kafka;
+﻿using AmadeusSDK;
+using Confluent.Kafka;
 using FlightSystem.Kafka.Models;
+using FlightSystem.Services;
 using FlightSystem.Services.Models;
 using System;
 using System.Collections.Generic;
@@ -9,9 +11,9 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.BookingListener;
 
-public class BookingListener(IConsumer<string, FlightOrder> consumer)
+public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusClient amadeusClient)
 {
-    public void Run(CancellationToken cancellationToken)
+    public async void Run(CancellationToken cancellationToken)
     {
         consumer.Subscribe("flight-orders");
         while (!cancellationToken.IsCancellationRequested)
@@ -20,7 +22,10 @@ public class BookingListener(IConsumer<string, FlightOrder> consumer)
             Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Message.Value}");
             // Simulate processing the booking
             Console.WriteLine("Processing booking...");
-            Thread.Sleep(2000); // Simulate some work
+            await amadeusClient.BookFlight(new AmadeusSDK.Models.FlightOrder() 
+            { 
+                flightOffers = consumeResult.Message.Value.flightOffers.Select(fo => fo.ToOffer()).ToList() 
+            });
             Console.WriteLine("Booking processed.");
         }
     }

@@ -6,7 +6,7 @@ using FlightSystem.BookingListener;
 using FlightSystem.Kafka.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
+using AmadeusSDK;
 
 IConfiguration configuration = new ConfigurationBuilder()
      .AddJsonFile("appsettings.json").Build();
@@ -24,6 +24,7 @@ var serviceProvider = new ServiceCollection()
     .AddLogging()
     .AddSingleton<BookingListener>()
     .AddBookingConsumer(configuration)
+    .AddAmadeusClient(configuration["Amadeus:ClientId"], configuration["Amadeus:ClientSecret"])
     .BuildServiceProvider();
 
 serviceProvider.GetRequiredService<BookingListener>().Run(cts.Token);
