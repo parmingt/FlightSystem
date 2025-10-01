@@ -8,6 +8,7 @@ using FlightSystem.UI.Components;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using FlightSystem.Kafka.Models;
+using FlightSystem.Services.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBlazorBootstrap();

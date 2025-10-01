@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Confluent.Kafka.SyncOverAsync;
+using FlightSystem.Services.Models;
 
 namespace FlightSystem.BookingListener;
 

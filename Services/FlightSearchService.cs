@@ -4,8 +4,7 @@ using Confluent.Kafka;
 using FlightSystem.Data;
 using FlightSystem.Services.Models;
 using Microsoft.Extensions.Caching.Memory;
-using FlightSystem.Kafka.Models;
-using FlightOrder = FlightSystem.Kafka.Models.FlightOrder;
+using FlightOrder = FlightSystem.Services.Models.FlightOrder;
 using System.Text.Json;
 
 namespace FlightSystem.Services;
@@ -37,10 +36,6 @@ public class FlightSearchService
 
     public async Task<bool> ConfirmFlight(FlightOffer flight)
     {
-        //if (!memoryCache.TryGetValue(("offers", flight), out AmadeusSDK.Models.OffersSearch.Offers? cachedOffer)
-        //        || cachedOffer is null)
-        //    return false;
-
         var amadeusOffer = flight.ToOffer();
         var confirmation = await routesClient.ConfirmFlightOffer(new List<AmadeusSDK.Models.OffersSearch.Offers> { amadeusOffer });
         return confirmation.First().price.total == amadeusOffer.price.total;
@@ -48,19 +43,9 @@ public class FlightSearchService
 
     public async Task<BookedFlight> BookFlight(FlightOffer flight)
     {
-        if (!memoryCache.TryGetValue(("offers", flight), out AmadeusSDK.Models.OffersSearch.Offers? cachedOffer)
-                || cachedOffer is null)
-            throw new Exception("Flight offer not found in cache.");
-
-        string jsonString = JsonSerializer.Serialize(cachedOffer);
-        var kafkaOffer = JsonSerializer.Deserialize<Kafka.Models.OffersSearch.Offers>(jsonString
-            , new JsonSerializerOptions()
-            {
-                RespectNullableAnnotations = true
-            });
         var order = new FlightOrder()
         {
-            flightOffers = [kafkaOffer]
+            flightOffers = [flight]
         };
         await producer.ProduceAsync("flight-orders", new Message<string, FlightOrder>
         {

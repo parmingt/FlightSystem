@@ -2,6 +2,7 @@
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using FlightSystem.Kafka.Models;
+using FlightSystem.Services.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.Kafka;
@@ -48,7 +49,7 @@ public sealed class ListenerTests
             Key = "flight-order",
             Value = new FlightOrder()
             {
-                flightOffers = Array.Empty<OffersSearch.Offers>()
+                flightOffers = Array.Empty<FlightOffer>()
             }
         });
 

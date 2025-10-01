@@ -1,5 +1,6 @@
 ﻿using Confluent.Kafka;
 using FlightSystem.Kafka.Models;
+using FlightSystem.Services.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

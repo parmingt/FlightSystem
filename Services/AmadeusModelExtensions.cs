@@ -9,7 +9,7 @@ using static AmadeusSDK.Models.OffersSearch;
 
 namespace FlightSystem.Services;
 
-internal static class Extensions
+internal static class AmadeusModelExtensions
 {
     internal static Models.FlightOffer ToFlight(this Offers offer)
     {
