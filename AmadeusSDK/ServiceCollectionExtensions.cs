@@ -24,7 +24,7 @@ public static class ServiceCollectionExtensions
         {
             client.BaseAddress = new Uri("https://test.api.amadeus.com/");
         });
-
+        serviceCollection.AddSingleton<IAmadeusClient, AmadeusClient>();
         return serviceCollection;
     }
 }
