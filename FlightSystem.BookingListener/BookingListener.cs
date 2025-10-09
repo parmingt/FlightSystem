@@ -18,7 +18,7 @@ public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusCl
         consumer.Subscribe("flight-orders");
         while (!cancellationToken.IsCancellationRequested)
         {
-            var consumeResult = consumer.Consume();
+            var consumeResult = consumer.Consume(cancellationToken);
             Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Message.Value}");
             // Simulate processing the booking
             Console.WriteLine("Processing booking...");

@@ -4,6 +4,7 @@ using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using Docker.DotNet.Models;
 using DotNet.Testcontainers.Builders;
+using FlightSystem.BookingListener.Tests.Fakes;
 using FlightSystem.Kafka.Models;
 using FlightSystem.Services.Models;
 using Microsoft.Extensions.Configuration;
@@ -27,7 +28,8 @@ public sealed class ListenerTests
             .AddLogging()
             .AddSingleton<BookingListener>()
             .AddBookingConsumer(configuration)
-            .AddSingleton<IAmadeusClient, AmadeusClient>()
+            .AddSingleton<IAmadeusClient, AmadeusClientFake>()
+            .AddMemoryCache()
             .BuildServiceProvider();
 
         var _kafkaNetwork = new NetworkBuilder().WithName(Guid.NewGuid().ToString("D")).Build();
@@ -35,7 +37,7 @@ public sealed class ListenerTests
 
         var kafkaContainer = new KafkaBuilder()
           .WithImage("confluentinc/cp-kafka:6.2.10")
-          .WithPortBinding(19092)
+          .WithPortBinding(19092, true)
           .WithNetwork(_kafkaNetwork)
           .WithNetworkAliases("kafka")
           .WithListener("kafka:19092")
@@ -74,7 +76,7 @@ public sealed class ListenerTests
             Value = new FlightOrder()
             {
                 
-                flightOffers = [  ],  
+                flightOffers = [ offer ],  
             }
         });
 
