@@ -4,6 +4,7 @@ using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
 using Docker.DotNet.Models;
 using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Containers;
 using FlightSystem.BookingListener.Tests.Fakes;
 using FlightSystem.Kafka.Models;
 using FlightSystem.Services.Models;
@@ -18,6 +19,9 @@ public sealed class ListenerTests
 {
     private IProducer<string, FlightOrder> _producer;
     private ServiceProvider _serviceProvider;
+    private AmadeusClientFake _amadeusClientFake = new();
+    private KafkaContainer _kafkaContainer;
+    private IContainer _schemaRegistryContainer;
 
     [TestInitialize]
     public async Task Setup()
@@ -28,24 +32,27 @@ public sealed class ListenerTests
             .AddLogging()
             .AddSingleton<BookingListener>()
             .AddBookingConsumer(configuration)
-            .AddSingleton<IAmadeusClient, AmadeusClientFake>()
+            .AddSingleton<IAmadeusClient>(_amadeusClientFake)
             .AddMemoryCache()
             .BuildServiceProvider();
 
         var _kafkaNetwork = new NetworkBuilder().WithName(Guid.NewGuid().ToString("D")).Build();
         _kafkaNetwork.CreateAsync().Wait();
 
-        var kafkaContainer = new KafkaBuilder()
+        _kafkaContainer = new KafkaBuilder()
           .WithImage("confluentinc/cp-kafka:6.2.10")
-          .WithPortBinding(19092, true)
+          .WithPortBinding(19095)
+          .WithExposedPort(19095)
           .WithNetwork(_kafkaNetwork)
           .WithNetworkAliases("kafka")
           .WithListener("kafka:19092")
+          .WithListener("localhost:19095")
+          .WithEnvironment("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "TC-1:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_EXTERNAL:PLAINTEXT,TC-0:PLAINTEXT,BROKER:PLAINTEXT,CONTROLLER:PLAINTEXT")
           .Build();
-        await kafkaContainer.StartAsync();
+        await _kafkaContainer.StartAsync();
 
-        var bootstrapServers = kafkaContainer.GetBootstrapAddress();
-        var schemaRegistryContainer = new ContainerBuilder()
+        var bootstrapServers = _kafkaContainer.GetBootstrapAddress();
+        _schemaRegistryContainer = new ContainerBuilder()
           .WithImage("confluentinc/cp-schema-registry:7.5.2")
           .WithNetwork(_kafkaNetwork)
           .WithPortBinding(18083)
@@ -54,14 +61,24 @@ public sealed class ListenerTests
           .WithEnvironment("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS", $"PLAINTEXT://kafka:19092")
           .WithWaitStrategy(Wait.ForUnixContainer().UntilMessageIsLogged("Server started, listening for requests..."))
           .Build();
-        await schemaRegistryContainer.StartAsync();
+        await _schemaRegistryContainer.StartAsync();
 
+        _serviceProvider.GetRequiredService<Kafka.Models.KafkaConfiguration>().BootstrapServers = bootstrapServers;
         var schemaRegistry = _serviceProvider.GetRequiredService<ISchemaRegistryClient>();
         _producer = new ProducerBuilder<string, FlightOrder>(new ProducerConfig
         {
             BootstrapServers = bootstrapServers
         }).SetValueSerializer(new JsonSerializer<FlightOrder>(schemaRegistry))
         .Build();
+    }
+
+    [TestCleanup]
+    public async Task Cleanup()
+    {
+        _producer.Dispose();
+        _serviceProvider.Dispose();
+        await _kafkaContainer.DisposeAsync();
+        await _schemaRegistryContainer.DisposeAsync();
     }
 
     [TestMethod]
@@ -87,5 +104,7 @@ public sealed class ListenerTests
 
         var consumer = _serviceProvider.GetRequiredService<IConsumer<string, FlightOrder>>();
         Assert.IsTrue(consumer.Subscription.Contains("flight-orders"));
+        Assert.AreEqual(1, _amadeusClientFake.BookedOffers.Count);
+        Assert.AreEqual("10.0", _amadeusClientFake.BookedOffers[0].price.total);
     }
 }

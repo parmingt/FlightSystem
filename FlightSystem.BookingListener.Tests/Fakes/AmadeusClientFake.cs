@@ -10,8 +10,11 @@ namespace FlightSystem.BookingListener.Tests.Fakes;
 
 internal class AmadeusClientFake : IAmadeusClient
 {
+    public readonly List<OffersSearch.Offers> BookedOffers = [];
+
     public Task<List<OffersSearch.Offers>> BookFlight(FlightOrder order)
     {
+        BookedOffers.AddRange(order.flightOffers);
         return Task.FromResult(order.flightOffers);
     }
 
