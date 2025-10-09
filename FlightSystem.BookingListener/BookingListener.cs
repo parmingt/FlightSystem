@@ -13,7 +13,7 @@ namespace FlightSystem.BookingListener;
 
 public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusClient amadeusClient)
 {
-    public async void Run(CancellationToken cancellationToken)
+    public async Task Run(CancellationToken cancellationToken)
     {
         consumer.Subscribe("flight-orders");
         while (!cancellationToken.IsCancellationRequested)

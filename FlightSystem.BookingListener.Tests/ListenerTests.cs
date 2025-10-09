@@ -10,6 +10,7 @@ using FlightSystem.Kafka.Models;
 using FlightSystem.Services.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 using Testcontainers.Kafka;
 
 namespace FlightSystem.BookingListener.Tests;
@@ -41,13 +42,9 @@ public sealed class ListenerTests
 
         _kafkaContainer = new KafkaBuilder()
           .WithImage("confluentinc/cp-kafka:6.2.10")
-          .WithPortBinding(19095)
-          .WithExposedPort(19095)
           .WithNetwork(_kafkaNetwork)
           .WithNetworkAliases("kafka")
           .WithListener("kafka:19092")
-          .WithListener("localhost:19095")
-          .WithEnvironment("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "TC-1:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_EXTERNAL:PLAINTEXT,TC-0:PLAINTEXT,BROKER:PLAINTEXT,CONTROLLER:PLAINTEXT")
           .Build();
         await _kafkaContainer.StartAsync();
 
@@ -97,10 +94,13 @@ public sealed class ListenerTests
             }
         });
 
-        var token = new CancellationTokenSource();
-        token.CancelAfter(TimeSpan.FromSeconds(2));
+        var token = new CancellationTokenSource(1000);
 
-        _serviceProvider.GetRequiredService<BookingListener>().Run(token.Token);
+        try
+        {
+            await _serviceProvider.GetRequiredService<BookingListener>().Run(token.Token);
+        }
+        catch (OperationCanceledException){}
 
         var consumer = _serviceProvider.GetRequiredService<IConsumer<string, FlightOrder>>();
         Assert.IsTrue(consumer.Subscription.Contains("flight-orders"));
