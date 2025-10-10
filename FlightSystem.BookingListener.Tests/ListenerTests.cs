@@ -37,12 +37,12 @@ public sealed class ListenerTests
             .AddMemoryCache()
             .BuildServiceProvider();
 
-        var _kafkaNetwork = new NetworkBuilder().WithName(Guid.NewGuid().ToString("D")).Build();
-        _kafkaNetwork.CreateAsync().Wait();
+        var testContainerNetwork = new NetworkBuilder().Build();
+        await testContainerNetwork.CreateAsync();
 
         _kafkaContainer = new KafkaBuilder()
           .WithImage("confluentinc/cp-kafka:6.2.10")
-          .WithNetwork(_kafkaNetwork)
+          .WithNetwork(testContainerNetwork)
           .WithNetworkAliases("kafka")
           .WithListener("kafka:19092")
           .Build();
@@ -51,16 +51,18 @@ public sealed class ListenerTests
         var bootstrapServers = _kafkaContainer.GetBootstrapAddress();
         _schemaRegistryContainer = new ContainerBuilder()
           .WithImage("confluentinc/cp-schema-registry:7.5.2")
-          .WithNetwork(_kafkaNetwork)
-          .WithPortBinding(18083)
+          .WithNetwork(testContainerNetwork)
+          .WithPortBinding(18083, true)
           .WithEnvironment("SCHEMA_REGISTRY_HOST_NAME", "schema-registry")
           .WithEnvironment("SCHEMA_REGISTRY_LISTENERS", "http://0.0.0.0:18083")
           .WithEnvironment("SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS", $"PLAINTEXT://kafka:19092")
-          .WithWaitStrategy(Wait.ForUnixContainer().UntilMessageIsLogged("Server started, listening for requests..."))
+          .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(18083))
           .Build();
         await _schemaRegistryContainer.StartAsync();
 
+        var schemaRegistryPort = _schemaRegistryContainer.GetMappedPublicPort();
         _serviceProvider.GetRequiredService<Kafka.Models.KafkaConfiguration>().BootstrapServers = bootstrapServers;
+        configuration["SchemaRegistry:Url"] = $"http://localhost:{schemaRegistryPort}";
         var schemaRegistry = _serviceProvider.GetRequiredService<ISchemaRegistryClient>();
         _producer = new ProducerBuilder<string, FlightOrder>(new ProducerConfig
         {
@@ -89,8 +91,7 @@ public sealed class ListenerTests
             Key = "flight-order",
             Value = new FlightOrder()
             {
-                
-                flightOffers = [ offer ],  
+                flightOffers = [ offer ]
             }
         });
 
