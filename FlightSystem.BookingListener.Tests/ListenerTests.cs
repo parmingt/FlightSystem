@@ -20,23 +20,13 @@ public sealed class ListenerTests
 {
     private IProducer<string, FlightOrder> _producer;
     private ServiceProvider _serviceProvider;
-    private AmadeusClientFake _amadeusClientFake = new();
-    private KafkaContainer _kafkaContainer;
-    private IContainer _schemaRegistryContainer;
+    private AmadeusClientFake _amadeusClientFake;
+    private static KafkaContainer _kafkaContainer;
+    private static IContainer _schemaRegistryContainer;
 
-    [TestInitialize]
-    public async Task Setup()
+    [ClassInitialize]
+    public static async Task Setup(TestContext testContext)
     {
-        IConfiguration configuration = new ConfigurationBuilder()
-            .AddJsonFile("appsettings.json").Build();
-        _serviceProvider = new ServiceCollection()
-            .AddLogging()
-            .AddSingleton<BookingListener>()
-            .AddBookingConsumer(configuration)
-            .AddSingleton<IAmadeusClient>(_amadeusClientFake)
-            .AddMemoryCache()
-            .BuildServiceProvider();
-
         var testContainerNetwork = new NetworkBuilder().Build();
         await testContainerNetwork.CreateAsync();
 
@@ -48,7 +38,6 @@ public sealed class ListenerTests
           .Build();
         await _kafkaContainer.StartAsync();
 
-        var bootstrapServers = _kafkaContainer.GetBootstrapAddress();
         _schemaRegistryContainer = new ContainerBuilder()
           .WithImage("confluentinc/cp-schema-registry:7.5.2")
           .WithNetwork(testContainerNetwork)
@@ -59,9 +48,27 @@ public sealed class ListenerTests
           .WithWaitStrategy(Wait.ForUnixContainer().UntilInternalTcpPortIsAvailable(18083))
           .Build();
         await _schemaRegistryContainer.StartAsync();
+    }
 
+    [TestInitialize]
+    public async Task TestSetup()
+    {
+        _amadeusClientFake = new();
+        IConfiguration configuration = new ConfigurationBuilder()
+            .AddJsonFile("appsettings.json").Build();
+        _serviceProvider = new ServiceCollection()
+            .AddLogging()
+            .AddSingleton<BookingListener>()
+            .AddBookingConsumer(configuration)
+            .AddSingleton<IAmadeusClient>(_amadeusClientFake)
+            .AddMemoryCache()
+            .BuildServiceProvider();
+
+        var bookingTopic = $"flight-orders-{Guid.NewGuid()}";
+        var bootstrapServers = _kafkaContainer.GetBootstrapAddress();
         var schemaRegistryPort = _schemaRegistryContainer.GetMappedPublicPort();
         _serviceProvider.GetRequiredService<Kafka.Models.KafkaConfiguration>().BootstrapServers = bootstrapServers;
+        _serviceProvider.GetRequiredService<Kafka.Models.KafkaConfiguration>().BookingTopic = bookingTopic;
         configuration["SchemaRegistry:Url"] = $"http://localhost:{schemaRegistryPort}";
         var schemaRegistry = _serviceProvider.GetRequiredService<ISchemaRegistryClient>();
         _producer = new ProducerBuilder<string, FlightOrder>(new ProducerConfig
@@ -69,42 +76,69 @@ public sealed class ListenerTests
             BootstrapServers = bootstrapServers
         }).SetValueSerializer(new JsonSerializer<FlightOrder>(schemaRegistry))
         .Build();
+
+        var offer = new FlightOffer(DateTime.Now, new Price(10, "USD"), [
+            new Segment("123", "123", new IataCode("PHI"), new IataCode("SLC"), DateTime.Now, "1")
+        ], "123", [], "test", []);
+
+        await _producer.ProduceAsync(bookingTopic, new Message<string, FlightOrder>()
+        {
+            Key = "flight-order",
+            Value = new FlightOrder()
+            {
+                flightOffers = [offer]
+            }
+        });
+    }
+
+    [ClassCleanup]
+    public static async Task Cleanup()
+    {
+        await _kafkaContainer.DisposeAsync();
+        await _schemaRegistryContainer.DisposeAsync();
     }
 
     [TestCleanup]
-    public async Task Cleanup()
+    public void TestCleanup()
     {
-        _producer.Dispose();
+        _producer?.Dispose();
         _serviceProvider.Dispose();
-        await _kafkaContainer.DisposeAsync();
-        await _schemaRegistryContainer.DisposeAsync();
     }
 
     [TestMethod]
     public async Task ConsumesMessage()
     {
-        var offer = new FlightOffer(DateTime.Now, new Price(10, "USD"), [ 
-            new Segment("123", "123", new IataCode("PHI"), new IataCode("SLC"), DateTime.Now, "1")
-        ], "123", [], "test", []);
-        await _producer.ProduceAsync("flight-orders", new Message<string, FlightOrder>()
-        {
-            Key = "flight-order",
-            Value = new FlightOrder()
-            {
-                flightOffers = [ offer ]
-            }
-        });
-
         var token = new CancellationTokenSource(1000);
 
         try
         {
             await _serviceProvider.GetRequiredService<BookingListener>().Run(token.Token);
         }
-        catch (OperationCanceledException){}
+        catch (OperationCanceledException){ }
+        catch (Exception ex)
+        {
+            Assert.Fail(ex.Message);
+        }
 
-        var consumer = _serviceProvider.GetRequiredService<IConsumer<string, FlightOrder>>();
-        Assert.IsTrue(consumer.Subscription.Contains("flight-orders"));
+        Assert.AreEqual(1, _amadeusClientFake.BookedOffers.Count);
+        Assert.AreEqual("10.0", _amadeusClientFake.BookedOffers[0].price.total);
+    }
+
+    [TestMethod]
+    public async Task ConsumesMessage2()
+    {
+        var token = new CancellationTokenSource(1000);
+
+        try
+        {
+            await _serviceProvider.GetRequiredService<BookingListener>().Run(token.Token);
+        }
+        catch (OperationCanceledException) { }
+        catch (Exception ex)
+        {
+            Assert.Fail(ex.Message);
+        }
+
         Assert.AreEqual(1, _amadeusClientFake.BookedOffers.Count);
         Assert.AreEqual("10.0", _amadeusClientFake.BookedOffers[0].price.total);
     }

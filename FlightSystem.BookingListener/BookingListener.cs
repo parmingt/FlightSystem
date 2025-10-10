@@ -11,11 +11,11 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.BookingListener;
 
-public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusClient amadeusClient)
+public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusClient amadeusClient, KafkaConfiguration kafkaConfiguration)
 {
     public async Task Run(CancellationToken cancellationToken)
     {
-        consumer.Subscribe("flight-orders");
+        consumer.Subscribe(kafkaConfiguration.BookingTopic);
         while (!cancellationToken.IsCancellationRequested)
         {
             var consumeResult = consumer.Consume(cancellationToken);
