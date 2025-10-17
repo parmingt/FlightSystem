@@ -10,4 +10,5 @@ public class KafkaConfiguration
 {
     public string BootstrapServers { get; set; }
     public string BookingTopic { get; set; } = "flight-orders";
+    public string BookingConsumerGroupId { get; set; } = "booking-engine";
 }

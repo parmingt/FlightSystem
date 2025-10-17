@@ -5,6 +5,7 @@ using FlightSystem.Services;
 using FlightSystem.Services.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,7 @@ public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusCl
     public async Task Run(CancellationToken cancellationToken)
     {
         consumer.Subscribe(kafkaConfiguration.BookingTopic);
+
         while (!cancellationToken.IsCancellationRequested)
         {
             var consumeResult = consumer.Consume(cancellationToken);

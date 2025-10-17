@@ -35,7 +35,7 @@ public static class ServiceCollectionExtensions
             var consumerConfig = new ConsumerConfig
             {
                 BootstrapServers = sp.GetRequiredService<KafkaConfiguration>().BootstrapServers,
-                GroupId = $"booking-engine-{Guid.NewGuid()}",
+                GroupId = sp.GetRequiredService<KafkaConfiguration>().BookingConsumerGroupId,
                 AutoOffsetReset = AutoOffsetReset.Earliest
             };
 
