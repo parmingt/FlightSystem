@@ -21,9 +21,6 @@ public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusCl
         while (!cancellationToken.IsCancellationRequested)
         {
             var consumeResult = consumer.Consume(cancellationToken);
-            Console.WriteLine($"Received message at {consumeResult.TopicPartitionOffset}: {consumeResult.Message.Value}");
-            // Simulate processing the booking
-            Console.WriteLine("Processing booking...");
             await amadeusClient.BookFlight(new AmadeusSDK.Models.FlightOrder() 
             { 
                 flightOffers = consumeResult.Message.Value.flightOffers.Select(fo => fo.ToOffer()).ToList() 

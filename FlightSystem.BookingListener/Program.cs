@@ -1,9 +1,4 @@
-﻿using Confluent.Kafka;
-using Confluent.Kafka.SyncOverAsync;
-using Confluent.SchemaRegistry;
-using Confluent.SchemaRegistry.Serdes;
-using FlightSystem.BookingListener;
-using FlightSystem.Kafka.Models;
+﻿using FlightSystem.BookingListener;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AmadeusSDK;

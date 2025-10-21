@@ -1,1 +1,1 @@
-﻿[assembly: DoNotParallelize]
+﻿[assembly: Parallelize(Workers = 5, Scope = ExecutionScope.MethodLevel)]

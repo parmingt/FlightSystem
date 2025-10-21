@@ -64,7 +64,6 @@ public sealed class ListenerTests
             .AddSingleton<BookingListener>()
             .AddBookingConsumer(configuration)
             .AddSingleton<IAmadeusClient>(_amadeusClientFake)
-            .AddMemoryCache()
             .BuildServiceProvider();
 
         var bookingTopic = $"flight-orders-{Guid.NewGuid()}";

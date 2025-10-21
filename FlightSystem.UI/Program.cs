@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using FlightSystem.Kafka.Models;
 using FlightSystem.Services.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBlazorBootstrap();
@@ -44,6 +45,11 @@ builder.Services.AddSingleton(services =>
     var schemaRegistry = services.GetRequiredService<ISchemaRegistryClient>();
     return new ProducerBuilder<string, FlightOrder>(config)
         .SetValueSerializer(new JsonSerializer<FlightOrder>(schemaRegistry)).Build();
+});
+
+builder.Host.UseSerilog((context, services, configuration) =>
+{
+    configuration.ReadFrom.Configuration(context.Configuration);
 });
 
 var app = builder.Build();
