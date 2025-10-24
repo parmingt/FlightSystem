@@ -1,18 +1,10 @@
 ﻿using AmadeusSDK.Models;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
+using Serilog;
 using System.Diagnostics;
-using System.Linq;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
-using System.Reflection.Metadata.Ecma335;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 using static AmadeusSDK.Models.OffersSearch;
 
 namespace AmadeusSDK;
@@ -20,6 +12,7 @@ namespace AmadeusSDK;
 public class AmadeusClient : IAmadeusClient
 {
     private readonly HttpClient httpClient;
+    private readonly Serilog.ILogger logger;
     private readonly string clientId;
     private readonly string clientSecret;
     private readonly IMemoryCache memoryCache;
@@ -28,6 +21,7 @@ public class AmadeusClient : IAmadeusClient
     public AmadeusClient(IMemoryCache memoryCache, HttpClient httpClient, AmadeusClientOptions options)
     {
         this.httpClient = httpClient;
+        logger = Log.ForContext<AmadeusClient>();
         this.clientId = options.ClientId;
         this.clientSecret = options.ClientSecret;
         this.memoryCache = memoryCache;
@@ -39,11 +33,7 @@ public class AmadeusClient : IAmadeusClient
         var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}&currencyCode=USD";
         var response = await client.GetAsync(endpoint);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            Debug.WriteLine($"Error fetching flight offers: {response.StatusCode} - {response.ReasonPhrase}");
-            return [];
-        }
+        await IsSuccessful(response);
 
         try
         {
@@ -74,11 +64,7 @@ public class AmadeusClient : IAmadeusClient
         };
 
         var response = await client.PostAsJsonAsync(endpoint, request);
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorContent = await response.Content.ReadAsStringAsync();
-            throw new Exception($"Error confirming flight offers: {errorContent}");
-        }
+        await IsSuccessful(response);
 
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<PricingConfirmation>(json);
@@ -93,6 +79,10 @@ public class AmadeusClient : IAmadeusClient
         var request = new DataWrapper<FlightOrder>(order);
         var requestJson = JsonSerializer.Serialize(request);
         var response = await client.PostAsJsonAsync(endpoint, request);
+
+        if (!await IsSuccessful(response))
+            return [];
+
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<DataWrapper<FlightOrder>>(json);
         return confirmedOffers.data.flightOffers;
@@ -126,6 +116,18 @@ public class AmadeusClient : IAmadeusClient
         var token = await GetTokenAsync();
         httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
         return httpClient;
+    }
+
+    private async Task<bool> IsSuccessful(HttpResponseMessage response)
+    {
+        if (!response.IsSuccessStatusCode)
+        {
+            var errorContent = await response.Content.ReadAsStringAsync();
+            var errors = JsonSerializer.Deserialize<ErrorResponse>(errorContent);
+            logger.ForContext("ResponseContent", errorContent)
+                  .Error("Error confirming flight offers: {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+        }
+        return response.IsSuccessStatusCode;
     }
 
 }

@@ -50,6 +50,7 @@ builder.Services.AddSingleton(services =>
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration.ReadFrom.Configuration(context.Configuration);
+    configuration.Enrich.FromLogContext();
 });
 
 var app = builder.Build();

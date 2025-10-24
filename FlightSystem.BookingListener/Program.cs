@@ -2,9 +2,14 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using AmadeusSDK;
+using Serilog;
+using Serilog.Settings.Configuration;
+using Serilog.Events;
 
 IConfiguration configuration = new ConfigurationBuilder()
-     .AddJsonFile("appsettings.json").Build();
+     .AddJsonFile("appsettings.json")
+     .AddUserSecrets<Program>()
+     .Build();
 
 CancellationTokenSource cts = new CancellationTokenSource();
 
@@ -15,6 +20,11 @@ Console.CancelKeyPress += (sender, eventArgs) =>
     eventArgs.Cancel = true;
 };
 
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Debug()
+    .ReadFrom.Configuration(configuration)
+    .CreateLogger();
+
 var serviceProvider = new ServiceCollection()
     .AddLogging()
     .AddSingleton<BookingListener>()
@@ -22,4 +32,4 @@ var serviceProvider = new ServiceCollection()
     .AddAmadeusClient(configuration["Amadeus:ClientId"], configuration["Amadeus:ClientSecret"])
     .BuildServiceProvider();
 
-serviceProvider.GetRequiredService<BookingListener>().Run(cts.Token);
+await serviceProvider.GetRequiredService<BookingListener>().Run(cts.Token);
