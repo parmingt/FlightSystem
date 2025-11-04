@@ -65,7 +65,7 @@ public class BookingService
         return bookings.Select(b => 
             new BookedFlight(new FlightOffer(
                 b.Segments.First().Departure,
-                new Models.Price(b.Price.Total, b.Price.Currency.Name),
+                new Models.Price(b.Price.Total, b.Price.Currency.Name, 0),
                 b.Segments.Select(s => 
                     new Models.Segment("test", "11"
                         , new IataCode(s.Origin.Code)

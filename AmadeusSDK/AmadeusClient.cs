@@ -33,7 +33,7 @@ public class AmadeusClient : IAmadeusClient
         var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}&currencyCode=USD";
         var response = await client.GetAsync(endpoint);
 
-        await IsSuccessful(response);
+        await IsSuccessful<bool>(response);
 
         try
         {
@@ -64,7 +64,7 @@ public class AmadeusClient : IAmadeusClient
         };
 
         var response = await client.PostAsJsonAsync(endpoint, request);
-        await IsSuccessful(response);
+        await IsSuccessful<bool>(response);
 
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<PricingConfirmation>(json);
@@ -80,7 +80,7 @@ public class AmadeusClient : IAmadeusClient
         var requestJson = JsonSerializer.Serialize(request);
         var response = await client.PostAsJsonAsync(endpoint, request);
 
-        if (!await IsSuccessful(response))
+        if (!await IsSuccessful(response, request))
             return [];
 
         var json = await response.Content.ReadAsStringAsync();
@@ -118,14 +118,15 @@ public class AmadeusClient : IAmadeusClient
         return httpClient;
     }
 
-    private async Task<bool> IsSuccessful(HttpResponseMessage response)
+    private async Task<bool> IsSuccessful<TRequest>(HttpResponseMessage response, DataWrapper<TRequest>? request = null)
     {
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync();
             var errors = JsonSerializer.Deserialize<ErrorResponse>(errorContent);
             logger.ForContext("ResponseContent", errorContent)
-                  .Error("Error confirming flight offers: {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+                .ForContext("RequestData", JsonSerializer.Serialize(request))
+                .Error("Error confirming flight offers: {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
         }
         return response.IsSuccessStatusCode;
     }

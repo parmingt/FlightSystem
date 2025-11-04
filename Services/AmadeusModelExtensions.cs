@@ -14,7 +14,7 @@ public static class AmadeusModelExtensions
     public static Models.FlightOffer ToFlight(this Offers offer)
     {
         return new FlightOffer(offer.itineraries[0].segments[0].departure.at
-            , new Models.Price(Decimal.Parse(offer.price.total), offer.price.currency)
+            , new Models.Price(decimal.Parse(offer.price.total), offer.price.currency, decimal.Parse(offer.price._base))
             , offer.itineraries[0].segments.ToList().Select(s =>
                 new Models.Segment(s.carrierCode
                 , s.number
@@ -35,10 +35,11 @@ public static class AmadeusModelExtensions
         {
             type = "flight-offer",
             id = flight.OfferId,
-            price = new AmadeusSDK.Models.OffersSearch.Price
+            price = new OffersSearch.Price
             {
                 total = flight.Price.Total.ToString(),
-                currency = flight.Price.Currency
+                currency = flight.Price.Currency,
+                _base = flight.Price.Base.ToString()
             },
             itineraries = [
                 new Itinerary
@@ -70,7 +71,7 @@ public static class AmadeusModelExtensions
     private static TravelerPricing ToTravelerPricing(this Travelerpricing travelerpricing)
     {
         return new TravelerPricing(travelerpricing.travelerId, travelerpricing.fareOption, travelerpricing.travelerType, 
-            new Models.Price(Decimal.Parse(travelerpricing.price.total), travelerpricing.price.currency),
+            new Models.Price(decimal.Parse(travelerpricing.price.total), travelerpricing.price.currency, decimal.Parse(travelerpricing.price._base)),
             travelerpricing.fareDetailsBySegment.Select(d => d.ToFareDetailBySegment()).ToList());
     }
 
@@ -84,7 +85,8 @@ public static class AmadeusModelExtensions
             price = new Price1
             {
                 total = travelerPricing.Price.Total.ToString(),
-                currency = travelerPricing.Price.Currency
+                currency = travelerPricing.Price.Currency,
+                _base = travelerPricing.Price.Base.ToString()
             },
             fareDetailsBySegment = travelerPricing.FareDetails.Select(d => d.ToAmadeusFareDetailBySegment()).ToArray()
         };

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace FlightSystem.Services.Models;
 
-public record Price(decimal Total, string Currency)
+public record Price(decimal Total, string Currency, decimal Base)
 {
     public override string ToString()
     {

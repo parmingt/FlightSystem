@@ -50,6 +50,7 @@ builder.Services.AddSingleton(services =>
 builder.Host.UseSerilog((context, services, configuration) =>
 {
     configuration.ReadFrom.Configuration(context.Configuration);
+    configuration.WriteTo.File("C:\\log\\Flights\\apptest.log", rollingInterval: RollingInterval.Day);
     configuration.Enrich.FromLogContext();
 });
 

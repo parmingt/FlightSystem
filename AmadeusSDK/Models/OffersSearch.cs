@@ -49,6 +49,8 @@ public class OffersSearch
     {
         public string currency { get; set; }
         public string total { get; set; }
+
+        [JsonPropertyName("base")]
         public string? _base { get; set; }
         public Fee[] fees { get; set; }
         public string grandTotal { get; set; }
@@ -132,6 +134,8 @@ public class OffersSearch
     {
         public string currency { get; set; }
         public string total { get; set; }
+
+        [JsonPropertyName("base")]
         public string _base { get; set; }
     }
 

@@ -23,6 +23,7 @@ Console.CancelKeyPress += (sender, eventArgs) =>
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Debug()
     .ReadFrom.Configuration(configuration)
+    .WriteTo.File("C:\\log\\Flights\\apptest.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 
 var serviceProvider = new ServiceCollection()
