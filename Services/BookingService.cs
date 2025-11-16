@@ -33,12 +33,12 @@ public class BookingService
 
         var newBooking = new Data.Booking()
         {
-            Segments = selectedFlight.Segments.Select(s => new Data.Segment
-            {
-                Origin = context.Airports.First(a => a.Code == s.Origin.ToString()),
-                Destination = context.Airports.First(a => a.Code == s.Destination.ToString()),
-                Departure = s.Departure
-            }).ToList(),
+            //Segments = selectedFlight.Segments.Select(s => new Data.Segment
+            //{
+            //    Origin = context.Airports.First(a => a.Code == s.Origin.ToString()),
+            //    Destination = context.Airports.First(a => a.Code == s.Destination.ToString()),
+            //    Departure = s.Departure
+            //}).ToList(),
             Price = new Data.Price()
             {
                 Total = selectedFlight.Price.Total,
@@ -54,26 +54,27 @@ public class BookingService
     public async Task<List<BookedFlight>> GetBookings()
     {
         var bookings = await context.Bookings
-            .Include(b => b.Segments).ThenInclude(s => s.Origin)
-            .Include(b => b.Segments).ThenInclude(s => s.Destination)
-            .Include(b => b.Price).ThenInclude(p => p.Currency)
+            //.Include(b => b.Segments).ThenInclude(s => s.Origin)
+            //.Include(b => b.Segments).ThenInclude(s => s.Destination)
+            //.Include(b => b.Price).ThenInclude(p => p.Currency)
         .ToListAsync();
 
         if (bookings is null)
             return new();
 
-        return bookings.Select(b => 
-            new BookedFlight(new FlightOffer(
-                b.Segments.First().Departure,
-                new Models.Price(b.Price.Total, b.Price.Currency.Name, 0),
-                b.Segments.Select(s => 
-                    new Models.Segment("test", "11"
-                        , new IataCode(s.Origin.Code)
-                        , new IataCode(s.Destination.Code)
-                        , s.Departure
-                        , "")
-                    ).ToList() 
-                , "", [], "", []), b.BookingDate))
-            .ToList();
+        return [];
+        //return bookings.Select(b => 
+        //    new BookedFlight(new FlightOffer(
+        //        b.Segments.First().Departure,
+        //        new Models.Price(b.Price.Total, b.Price.Currency.Name, 0),
+        //        b.Segments.Select(s => 
+        //            new Models.Segment("test", "11"
+        //                , new IataCode(s.Origin.Code)
+        //                , new IataCode(s.Destination.Code)
+        //                , s.Departure
+        //                , "")
+        //            ).ToList() 
+        //        , "", [], "", []), b.BookingDate))
+        //    .ToList();
     }
 }

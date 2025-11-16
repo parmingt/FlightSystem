@@ -1,9 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace AmadeusSDK;
 
@@ -13,6 +9,8 @@ public static class ServiceCollectionExtensions
         , string clientId
         , string clientSecret)
     {
+        serviceCollection.AddMemoryCache();
+
         serviceCollection.AddSingleton<AmadeusClientOptions>(collection =>
         {
             return new AmadeusClientOptions(clientId, clientSecret);

@@ -10,6 +10,8 @@ public class FlightContext : DbContext
 {
     public DbSet<Airport> Airports { get; set; }
     public DbSet<Segment> Segments { get; set; }
+    public DbSet<Flight> Flights { get; set; }
+    public DbSet<Seat> Seats { get; set; }
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<Currency> Currency { get; set; }
     public DbSet<BookingStatus> BookingStatus { get; set; }
@@ -47,8 +49,24 @@ public class Segment
     public required DateTime Departure { get; set; }
 }
 
+public class Flight
+{
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
+    public Guid? Id { get; set; }
+    public required List<Segment> Segments { get; set; }
+    public required List<Seat> Seats { get; set; }
+}
 
-public class Booking
+public class Seat
+{
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    [Key]
+    public Guid? Id { get; set; }
+    public Booking? Booking { get; set; }
+}
+
+    public class Booking
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
@@ -56,7 +74,6 @@ public class Booking
 
     public required Price Price { get; set; }
 
-    public required ICollection<Segment> Segments { get; set; }
     public required BookingStatus Status { get; set; }
     public required DateTime BookingDate { get; set; } = DateTime.MinValue;
 }
