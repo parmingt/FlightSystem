@@ -82,7 +82,7 @@ public sealed class ListenerTests
         }).SetValueSerializer(new JsonSerializer<FlightOrder>(schemaRegistry))
         .Build();
 
-        var offer = new FlightOffer(DateTime.Now, new Price(10, "USD"), [
+        var offer = new FlightOffer(DateTime.Now, new Price(10, "USD", 10), [
             new Segment("123", "123", new IataCode("PHI"), new IataCode("SLC"), DateTime.Now, "1")
         ], "123", [], "test", []);
 

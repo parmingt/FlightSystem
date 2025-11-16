@@ -1,5 +1,4 @@
 ﻿using AmadeusSDK.Models;
-using Microsoft.Extensions.Caching.Memory;
 using Serilog;
 using System.Diagnostics;
 using System.Net.Http.Headers;
@@ -15,16 +14,14 @@ public class AmadeusClient : IAmadeusClient
     private readonly Serilog.ILogger logger;
     private readonly string clientId;
     private readonly string clientSecret;
-    private readonly IMemoryCache memoryCache;
     private readonly string tokenCacheKey = "amadeusToken";
 
-    public AmadeusClient(IMemoryCache memoryCache, HttpClient httpClient, AmadeusClientOptions options)
+    public AmadeusClient(HttpClient httpClient, AmadeusClientOptions options)
     {
         this.httpClient = httpClient;
         logger = Log.ForContext<AmadeusClient>();
         this.clientId = options.ClientId;
         this.clientSecret = options.ClientSecret;
-        this.memoryCache = memoryCache;
     }
     public async Task<List<Offers>> SearchFlightsAsync(string origin, string destination, DateTime departure, int numAdults = 1)
     {
@@ -90,9 +87,6 @@ public class AmadeusClient : IAmadeusClient
 
     public async Task<string> GetTokenAsync()
     {
-        if (memoryCache.TryGetValue(tokenCacheKey, out string cacheValue))
-            return cacheValue;
-
         var endpoint = "v1/security/oauth2/token";
         var dict = new Dictionary<string, string>
         {
@@ -104,10 +98,8 @@ public class AmadeusClient : IAmadeusClient
         var response = await httpClient.PostAsync(endpoint, content);
         var json = await response.Content.ReadAsStringAsync();
         var token = JsonSerializer.Deserialize<AmadeusToken>(json);
-        var cacheEntryOptions = new MemoryCacheEntryOptions()
-            .SetSlidingExpiration(TimeSpan.FromSeconds(token.expires_in));
-
-        memoryCache.Set(tokenCacheKey, token.access_token, cacheEntryOptions);
+        //var cacheEntryOptions = new MemoryCacheEntryOptions()
+        //    .SetSlidingExpiration(TimeSpan.FromSeconds(token.expires_in));
         return token.access_token;
     }
 

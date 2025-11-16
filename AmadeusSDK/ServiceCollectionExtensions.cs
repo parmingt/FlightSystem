@@ -13,8 +13,6 @@ public static class ServiceCollectionExtensions
         , string clientId
         , string clientSecret)
     {
-        serviceCollection.AddMemoryCache();
-
         serviceCollection.AddSingleton<AmadeusClientOptions>(collection =>
         {
             return new AmadeusClientOptions(clientId, clientSecret);

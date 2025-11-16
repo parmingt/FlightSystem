@@ -11,8 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FlightSystem.Data.Migrations
 {
     [DbContext(typeof(FlightContext))]
-    [Migration("20250105113601_add identity attributes")]
-    partial class addidentityattributes
+    [Migration("20251116201547_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,14 +48,44 @@ namespace FlightSystem.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid>("PriceId")
+                    b.Property<DateTime>("BookingDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("Bookings");
+                });
+
+            modelBuilder.Entity("FlightSystem.Data.BookingStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PriceId");
+                    b.ToTable("BookingStatus");
 
-                    b.ToTable("Bookings");
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Name = "Pending"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Name = "Confirmed"
+                        });
                 });
 
             modelBuilder.Entity("FlightSystem.Data.Currency", b =>
@@ -79,6 +109,9 @@ namespace FlightSystem.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT");
 
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("TEXT");
+
                     b.Property<Guid>("CurrencyId")
                         .HasColumnType("TEXT");
 
@@ -86,6 +119,9 @@ namespace FlightSystem.Data.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
 
                     b.HasIndex("CurrencyId");
 
@@ -123,17 +159,23 @@ namespace FlightSystem.Data.Migrations
 
             modelBuilder.Entity("FlightSystem.Data.Booking", b =>
                 {
-                    b.HasOne("FlightSystem.Data.Price", "Price")
+                    b.HasOne("FlightSystem.Data.BookingStatus", "Status")
                         .WithMany()
-                        .HasForeignKey("PriceId")
+                        .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Price");
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("FlightSystem.Data.Price", b =>
                 {
+                    b.HasOne("FlightSystem.Data.Booking", null)
+                        .WithOne("Price")
+                        .HasForeignKey("FlightSystem.Data.Price", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("FlightSystem.Data.Currency", "Currency")
                         .WithMany()
                         .HasForeignKey("CurrencyId")
@@ -168,6 +210,9 @@ namespace FlightSystem.Data.Migrations
 
             modelBuilder.Entity("FlightSystem.Data.Booking", b =>
                 {
+                    b.Navigation("Price")
+                        .IsRequired();
+
                     b.Navigation("Segments");
                 });
 #pragma warning restore 612, 618
