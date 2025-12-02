@@ -21,7 +21,7 @@ builder.Services.AddRazorComponents()
 builder.Services.AddMemoryCache();
 
 builder.Services.AddDbContextFactory<FlightContext>(options =>
-    options.UseSqlite(builder.Configuration["ConnectionStrings:SQLiteDefault"]), ServiceLifetime.Singleton);
+    options.UseNpgsql(builder.Configuration.GetConnectionString("FlightsDb")), ServiceLifetime.Singleton);
 
 builder.Services.AddAmadeusClient(builder.Configuration["Amadeus:ClientId"], builder.Configuration["Amadeus:ClientSecret"]);
 

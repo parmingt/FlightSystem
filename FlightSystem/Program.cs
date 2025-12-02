@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using Npgsql.EntityFrameworkCore.PostgreSQL;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.Resource;
 
@@ -13,7 +14,8 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<FlightContext>(options =>
-    options.UseSqlite(builder.Configuration["ConnectionStrings:SQLiteDefault"]),
+    //options.UseSqlite(builder.Configuration["ConnectionStrings:SQLiteDefault"]),
+    options.UseNpgsql(builder.Configuration.GetConnectionString("FlightsDb")),
     ServiceLifetime.Scoped);
 
 

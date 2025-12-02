@@ -5,34 +5,39 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
 namespace FlightSystem.Data.Migrations
 {
     [DbContext(typeof(FlightContext))]
-    [Migration("20251116201547_Initial")]
+    [Migration("20251202151300_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
+            modelBuilder
+                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("FlightSystem.Data.Airport", b =>
                 {
                     b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Code")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -46,13 +51,13 @@ namespace FlightSystem.Data.Migrations
                 {
                     b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("BookingDate")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("StatusId")
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -65,11 +70,13 @@ namespace FlightSystem.Data.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -92,31 +99,54 @@ namespace FlightSystem.Data.Migrations
                 {
                     b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
                     b.ToTable("Currency");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("3dc7dbec-b822-4f70-a353-b516483ff6c8"),
+                            Name = "USD"
+                        },
+                        new
+                        {
+                            Id = new Guid("e5661944-946f-4d33-b674-a51e8c447efb"),
+                            Name = "EUR"
+                        });
+                });
+
+            modelBuilder.Entity("FlightSystem.Data.Flight", b =>
+                {
+                    b.Property<Guid?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Flights");
                 });
 
             modelBuilder.Entity("FlightSystem.Data.Price", b =>
                 {
                     b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("BookingId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid>("CurrencyId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<decimal>("Total")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
@@ -128,29 +158,62 @@ namespace FlightSystem.Data.Migrations
                     b.ToTable("Price");
                 });
 
-            modelBuilder.Entity("FlightSystem.Data.Segment", b =>
+            modelBuilder.Entity("FlightSystem.Data.Seat", b =>
                 {
                     b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
                     b.Property<Guid?>("BookingId")
-                        .HasColumnType("TEXT");
+                        .HasColumnType("uuid");
 
-                    b.Property<DateTime>("Departure")
-                        .HasColumnType("TEXT");
+                    b.Property<Guid?>("SegmentId")
+                        .HasColumnType("uuid");
 
-                    b.Property<Guid>("DestinationId")
-                        .HasColumnType("TEXT");
-
-                    b.Property<Guid>("OriginId")
-                        .HasColumnType("TEXT");
+                    b.Property<int>("Version")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId");
 
+                    b.HasIndex("SegmentId");
+
+                    b.ToTable("Seats");
+                });
+
+            modelBuilder.Entity("FlightSystem.Data.Segment", b =>
+                {
+                    b.Property<Guid?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CarrierCode")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("Departure")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("DestinationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("FlightId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Number")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("OriginId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
                     b.HasIndex("DestinationId");
+
+                    b.HasIndex("FlightId");
 
                     b.HasIndex("OriginId");
 
@@ -185,17 +248,30 @@ namespace FlightSystem.Data.Migrations
                     b.Navigation("Currency");
                 });
 
-            modelBuilder.Entity("FlightSystem.Data.Segment", b =>
+            modelBuilder.Entity("FlightSystem.Data.Seat", b =>
                 {
-                    b.HasOne("FlightSystem.Data.Booking", null)
-                        .WithMany("Segments")
+                    b.HasOne("FlightSystem.Data.Booking", "Booking")
+                        .WithMany()
                         .HasForeignKey("BookingId");
 
+                    b.HasOne("FlightSystem.Data.Segment", null)
+                        .WithMany("Seats")
+                        .HasForeignKey("SegmentId");
+
+                    b.Navigation("Booking");
+                });
+
+            modelBuilder.Entity("FlightSystem.Data.Segment", b =>
+                {
                     b.HasOne("FlightSystem.Data.Airport", "Destination")
                         .WithMany()
                         .HasForeignKey("DestinationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("FlightSystem.Data.Flight", null)
+                        .WithMany("Segments")
+                        .HasForeignKey("FlightId");
 
                     b.HasOne("FlightSystem.Data.Airport", "Origin")
                         .WithMany()
@@ -212,8 +288,16 @@ namespace FlightSystem.Data.Migrations
                 {
                     b.Navigation("Price")
                         .IsRequired();
+                });
 
+            modelBuilder.Entity("FlightSystem.Data.Flight", b =>
+                {
                     b.Navigation("Segments");
+                });
+
+            modelBuilder.Entity("FlightSystem.Data.Segment", b =>
+                {
+                    b.Navigation("Seats");
                 });
 #pragma warning restore 612, 618
         }

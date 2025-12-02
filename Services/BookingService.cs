@@ -1,11 +1,6 @@
 ﻿using FlightSystem.Data;
 using FlightSystem.Services.Models;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace FlightSystem.Services;
 
@@ -21,7 +16,7 @@ public class BookingService
     }
     public async Task BookFlight(FlightOffer selectedFlight)
     {
-        var confirmed = await flightSearchService.ConfirmFlight(selectedFlight);
+        var confirmed = true; // await flightSearchService.ConfirmFlight(selectedFlight);
 
         if (!confirmed)
         {
@@ -29,25 +24,55 @@ public class BookingService
             return;
         }
 
-        var booked = await flightSearchService.BookFlight(selectedFlight);
+        // Create segments in db
+        var segments = selectedFlight.Segments.Select(segment => 
+            context.Segments.Include(s => s.Seats).FirstOrDefault(s =>
+            segment.CarrierCode == s.CarrierCode &&
+            segment.Number == s.Number &&
+            segment.Departure.Date == s.Departure.Date)).Where(s => s is not null).ToList();
+
+        var segmentsToCreate = selectedFlight.Segments
+            .Where(s => !segments.Any(es =>
+                es.CarrierCode == s.CarrierCode &&
+                es.Number == s.Number &&
+                es.Departure.Date == s.Departure.Date))
+            .Select(s => new Data.Segment
+        {
+            CarrierCode = s.CarrierCode,
+            Number = s.Number,
+            Origin = context.Airports.First(a => a.Code == s.Origin.ToString()),
+            Destination = context.Airports.First(a => a.Code == s.Destination.ToString()),
+            Departure = s.Departure,
+            Seats = [
+                new Data.Seat()
+                {
+                    Version = 1
+                }]
+        }).ToList();
+        context.Segments.AddRange(segmentsToCreate);
+
+        segments.AddRange(segmentsToCreate);
+        await context.SaveChangesAsync();
+
+        // var booked = await flightSearchService.BookFlight(selectedFlight);
 
         var newBooking = new Data.Booking()
         {
-            //Segments = selectedFlight.Segments.Select(s => new Data.Segment
-            //{
-            //    Origin = context.Airports.First(a => a.Code == s.Origin.ToString()),
-            //    Destination = context.Airports.First(a => a.Code == s.Destination.ToString()),
-            //    Departure = s.Departure
-            //}).ToList(),
             Price = new Data.Price()
             {
                 Total = selectedFlight.Price.Total,
                 Currency = context.Currency.First(c => c.Name == selectedFlight.Price.Currency)
             },
             Status = context.BookingStatus.First(s => s.Name == "Pending"),
-            BookingDate = booked.BookingDate
+            BookingDate = DateTime.UtcNow
         };
         context.Bookings.Add(newBooking);
+        segments.SelectMany(s => s.Seats).ToList()
+            .ForEach(seat => {
+                seat.Booking = newBooking;
+                seat.Version++;
+            });
+        await Task.Delay(100);
         await context.SaveChangesAsync();
     }
 

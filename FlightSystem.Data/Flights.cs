@@ -21,10 +21,35 @@ public class FlightContext : DbContext
     { }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<BookingStatus>().HasData(new BookingStatus[] {
+        modelBuilder.Entity<BookingStatus>().HasData([
                 new() {Id=1,Name="Pending"},
                 new() {Id=2,Name="Confirmed"}
-            });
+            ]);
+
+        modelBuilder.Entity<Currency>().HasData([
+            new() {Name = "USD", Id = Guid.NewGuid() },
+            new() {Name = "EUR", Id = Guid.NewGuid() }
+            ]);
+
+        // guid identities
+        foreach (var entity in modelBuilder.Model.GetEntityTypes()
+            .Where(t =>
+                t.ClrType.GetProperties()
+                    .Any(p => p.CustomAttributes.Any(a => a.AttributeType == typeof(DatabaseGeneratedAttribute)))))
+        {
+            foreach (var property in entity.ClrType.GetProperties()
+                .Where(p => p.PropertyType == typeof(Guid) && p.CustomAttributes.Any(a => a.AttributeType == typeof(DatabaseGeneratedAttribute))))
+            {
+                modelBuilder
+                    .Entity(entity.ClrType)
+                    .Property(property.Name)
+                    .HasDefaultValueSql("newsequentialid()");
+            }
+        }
+
+        modelBuilder.Entity<Seat>()
+            .Property(s => s.Version)
+            .IsConcurrencyToken();
     }
 }
 
@@ -43,10 +68,13 @@ public class Segment
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     public Guid? Id { get; set; }
+    public string CarrierCode { get; set; } = string.Empty;
+    public string Number { get; set; } = string.Empty;
 
     public required Airport Origin { get; set; }
     public required Airport Destination { get; set; }
     public required DateTime Departure { get; set; }
+    public required List<Seat> Seats { get; set; }
 }
 
 public class Flight
@@ -55,7 +83,6 @@ public class Flight
     [Key]
     public Guid? Id { get; set; }
     public required List<Segment> Segments { get; set; }
-    public required List<Seat> Seats { get; set; }
 }
 
 public class Seat
@@ -63,6 +90,7 @@ public class Seat
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     public Guid? Id { get; set; }
+    public int Version { get; set; }
     public Booking? Booking { get; set; }
 }
 

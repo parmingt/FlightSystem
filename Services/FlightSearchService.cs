@@ -13,14 +13,11 @@ public class FlightSearchService
 {
     private readonly AmadeusClient routesClient;
     private readonly IMemoryCache memoryCache;
-    private readonly IProducer<string, FlightOrder> producer;
 
-    public FlightSearchService(AmadeusClient routesClient, IMemoryCache memoryCache,
-        IProducer<string, FlightOrder> producer)
+    public FlightSearchService(AmadeusClient routesClient, IMemoryCache memoryCache)
     {
         this.routesClient = routesClient;
         this.memoryCache = memoryCache;
-        this.producer = producer;
     }
 
     public async Task<List<Models.FlightOffer>> SearchFlightsAsync(IataCode origin, IataCode destination, DateOnly travelDate)
@@ -41,18 +38,18 @@ public class FlightSearchService
         return confirmation.First().price.total == amadeusOffer.price.total;
     }
 
-    public async Task<BookedFlight> BookFlight(FlightOffer flight)
-    {
-        var order = new FlightOrder()
-        {
-            flightOffers = [flight]
-        };
-        await producer.ProduceAsync("flight-orders", new Message<string, FlightOrder>
-        {
-            Key = "flight-order",
-            Value = order
-        });
+    //public async Task<BookedFlight> BookFlight(FlightOffer flight)
+    //{
+    //    var order = new FlightOrder()
+    //    {
+    //        flightOffers = [flight]
+    //    };
+    //    await producer.ProduceAsync("flight-orders", new Message<string, FlightOrder>
+    //    {
+    //        Key = "flight-order",
+    //        Value = order
+    //    });
 
-        return new BookedFlight(flight, DateTime.UtcNow);
-    }
+    //    return new BookedFlight(flight, DateTime.UtcNow);
+    //}
 }
