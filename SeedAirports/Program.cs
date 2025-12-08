@@ -7,9 +7,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
-var contextOptions = new DbContextOptionsBuilder<FlightContext>();
-contextOptions.UseSqlite("Data Source=C:\\Users\\parmy\\Documents\\localflights.dat");
-var context = new FlightContext(contextOptions.Options);
+var dbContextOptions = new DbContextOptionsBuilder<FlightContext>()
+    .UseNpgsql("Server=localhost;Port=5432;Database=Flights;User ID=postgres;password=postgres;timeout=1000");
+var context = new FlightContext(dbContextOptions.Options);
 context.Database.EnsureCreated();
 
 var airports = new List<Airport>();

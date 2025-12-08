@@ -18,7 +18,10 @@ public class FlightContext : DbContext
 
     public FlightContext(DbContextOptions<FlightContext> options)
     : base(options)
-    { }
+    {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<BookingStatus>().HasData([

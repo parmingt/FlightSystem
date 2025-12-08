@@ -16,7 +16,7 @@ public class BookingService
     }
     public async Task BookFlight(FlightOffer selectedFlight)
     {
-        var confirmed = true; // await flightSearchService.ConfirmFlight(selectedFlight);
+        var confirmed = await flightSearchService.ConfirmFlight(selectedFlight);
 
         if (!confirmed)
         {
@@ -53,8 +53,6 @@ public class BookingService
 
         segments.AddRange(segmentsToCreate);
         await context.SaveChangesAsync();
-
-        // var booked = await flightSearchService.BookFlight(selectedFlight);
 
         var newBooking = new Data.Booking()
         {
