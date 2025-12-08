@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Models = FlightSystem.Services.Models;
 using Data = FlightSystem.Data;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace FlightsSystem.Services.Tests;
 
@@ -50,6 +51,10 @@ public class BookingServiceTests
         serviceCollection.AddScoped<AirportsService>();
         serviceCollection.AddScoped<FlightSearchService>();
         serviceCollection.AddTransient<BookingService>();
+        serviceCollection.AddMemoryCache();
+        serviceCollection.AddTransient((serviceProvider) =>
+            FakeAmadeusClient.CreateFakeClient(serviceProvider.GetRequiredService<IMemoryCache>()));
+
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }
 
