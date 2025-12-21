@@ -66,7 +66,12 @@ public class BookingServiceTests
         context.Bookings.RemoveRange(context.Bookings);
         context.SaveChanges();
 
-        await Task.WhenAll(bookLaxFlight(), bookLaxFlight());
+        try
+        {
+            await Task.WhenAll(bookLaxFlight(), bookLaxFlight());
+            Assert.Fail("Expected concurrency exception not thrown");
+        }
+        catch (DbUpdateConcurrencyException){ }
 
         var bookings = context.Bookings.Include(b => b.Price).ToList();
         Assert.AreEqual(1, bookings.Count);
