@@ -25,19 +25,19 @@ public class BookingListener(IConsumer<string, FlightOrder> consumer, IAmadeusCl
             var consumeResult = consumer.Consume(cancellationToken);
             await amadeusClient.BookFlight(new AmadeusSDK.Models.FlightOrder() 
             { 
-                flightOffers = consumeResult.Message.Value.flightOffers.Select(fo => fo.ToOffer()).ToList(),
-                travelers = [
+                FlightOffers = consumeResult.Message.Value.flightOffers.Select(fo => fo.ToOffer()).ToList(),
+                Travelers = [
                     new Traveler(){
-                        id = "1",
-                        name = new Name(){
-                            firstName = "John",
-                            lastName = "Doe"
+                        Id = "1",
+                        Name = new Name(){
+                            FirstName = "John",
+                            LastName = "Doe"
                         },
-                        contact = new Contact() {
-                            emailAddress = "test@gmail.com"
+                        Contact = new Contact() {
+                            EmailAddress = "test@gmail.com"
                         },
-                        gender = "MALE",
-                        dateOfBirth = "1990-01-01"
+                        Gender = "MALE",
+                        DateOfBirth = "1990-01-01"
                     }
                 ]
             });

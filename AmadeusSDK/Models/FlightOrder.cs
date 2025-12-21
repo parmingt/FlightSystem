@@ -8,7 +8,7 @@ namespace AmadeusSDK.Models;
 
 public class FlightOrder
 {
-    public string type { get; set; } = "flight-order";
-    public List<OffersSearch.Offers> flightOffers { get; set; }
-    public List<Traveler> travelers { get; set; }
+    public string Type { get; set; } = "flight-order";
+    public List<OffersSearch.Offers> FlightOffers { get; set; }
+    public List<Traveler> Travelers { get; set; }
 }

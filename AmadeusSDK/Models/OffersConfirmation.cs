@@ -9,11 +9,11 @@ namespace AmadeusSDK.Models;
 
 public class PricingConfirmation
 {
-    public Data data { get; set; }
+    public Data Data { get; set; }
 }
 
 public class Data
 {
-    public string type { get; set; }
-    public List<Offers> flightOffers { get; set; }
+    public string Type { get; set; }
+    public List<Offers> FlightOffers { get; set; }
 }

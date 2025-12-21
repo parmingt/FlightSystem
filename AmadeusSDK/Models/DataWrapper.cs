@@ -10,8 +10,8 @@ internal class DataWrapper<T>
 {
     public DataWrapper(T data)
     {
-        this.data = data;
+        this.Data = data;
     }
 
-    public T data { get; set; }
+    public T Data { get; set; }
 }

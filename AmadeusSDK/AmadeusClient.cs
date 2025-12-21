@@ -17,6 +17,11 @@ public class AmadeusClient : IAmadeusClient
     private readonly string clientSecret;
     private readonly string tokenCacheKey = "amadeusToken";
     private readonly IMemoryCache memoryCache;
+    private readonly JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+    {
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        WriteIndented = true
+    };
 
     public AmadeusClient(IMemoryCache memoryCache, HttpClient httpClient, AmadeusClientOptions options)
     {
@@ -39,8 +44,8 @@ public class AmadeusClient : IAmadeusClient
         {
             var raw = await response.Content.ReadAsStringAsync();
             Console.WriteLine(raw);
-            var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>();
-            return offers!.data.ToList();
+            var offers = await response.Content.ReadFromJsonAsync<FlightOffersResponse>(jsonOptions);
+            return offers!.Data.ToList();
         }
         catch (Exception)
         {
@@ -56,10 +61,10 @@ public class AmadeusClient : IAmadeusClient
 
         var request = new PricingConfirmation()
         {
-            data = new Data
+            Data = new Data
             {
-                type = "flight-offers-pricing",
-                flightOffers = offersToConfirm
+                Type = "flight-offers-pricing",
+                FlightOffers = offersToConfirm
             }
         };
 
@@ -67,8 +72,8 @@ public class AmadeusClient : IAmadeusClient
         await IsSuccessful<bool>(response);
 
         var json = await response.Content.ReadAsStringAsync();
-        var confirmedOffers = JsonSerializer.Deserialize<PricingConfirmation>(json);
-        return confirmedOffers.data.flightOffers;
+        var confirmedOffers = JsonSerializer.Deserialize<PricingConfirmation>(json, jsonOptions);
+        return confirmedOffers.Data.FlightOffers;
     }
 
     public async Task<List<Offers>> BookFlight(FlightOrder order)
@@ -84,8 +89,8 @@ public class AmadeusClient : IAmadeusClient
             return [];
 
         var json = await response.Content.ReadAsStringAsync();
-        var confirmedOffers = JsonSerializer.Deserialize<DataWrapper<FlightOrder>>(json);
-        return confirmedOffers.data.flightOffers;
+        var confirmedOffers = JsonSerializer.Deserialize<DataWrapper<FlightOrder>>(json, jsonOptions);
+        return confirmedOffers.Data.FlightOffers;
     }
 
     public async Task<string> GetTokenAsync()

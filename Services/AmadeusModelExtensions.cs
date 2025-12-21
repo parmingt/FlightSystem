@@ -13,19 +13,19 @@ public static class AmadeusModelExtensions
 {
     public static Models.FlightOffer ToFlight(this Offers offer)
     {
-        return new FlightOffer(offer.itineraries[0].segments[0].departure.at
-            , new Models.Price(decimal.Parse(offer.price.total), offer.price.currency, decimal.Parse(offer.price._base))
-            , offer.itineraries[0].segments.ToList().Select(s =>
-                new Models.Segment(s.carrierCode
-                , s.number
-                , new IataCode(s.departure.iataCode)
-                , new IataCode(s.arrival.iataCode)
-                , s.departure.at
-                , s.id)).ToList(), 
-            offer.id, 
-            offer.travelerPricings.Select(t => t.ToTravelerPricing()).ToList(),
-            offer.source,
-            offer.validatingAirlineCodes.ToList()
+        return new FlightOffer(offer.Itineraries[0].Segments[0].Departure.At
+            , new Models.Price(decimal.Parse(offer.Price.Total), offer.Price.Currency, decimal.Parse(offer.Price.Base))
+            , offer.Itineraries[0].Segments.ToList().Select(s =>
+                new Models.Segment(s.CarrierCode
+                , s.Number
+                , new IataCode(s.Departure.IataCode)
+                , new IataCode(s.Arrival.IataCode)
+                , s.Departure.At
+                , s.Id)).ToList(), 
+            offer.Id, 
+            offer.TravelerPricings.Select(t => t.ToTravelerPricing()).ToList(),
+            offer.Source,
+            offer.ValidatingAirlineCodes.ToList()
         );
     }
 
@@ -33,74 +33,74 @@ public static class AmadeusModelExtensions
     {
         return new Offers()
         {
-            type = "flight-offer",
-            id = flight.OfferId,
-            price = new OffersSearch.Price
+            Type = "flight-offer",
+            Id = flight.OfferId,
+            Price = new OffersSearch.Price
             {
-                total = flight.Price.Total.ToString(),
-                currency = flight.Price.Currency,
-                _base = flight.Price.Base.ToString()
+                Total = flight.Price.Total.ToString(),
+                Currency = flight.Price.Currency,
+                Base = flight.Price.Base.ToString()
             },
-            itineraries = [
+            Itineraries = [
                 new Itinerary
                 {
-                    segments = flight.Segments.Select(s => new OffersSearch.Segment
+                    Segments = flight.Segments.Select(s => new OffersSearch.Segment
                     {
-                        carrierCode = s.CarrierCode,
-                        number = s.Number,
-                        departure = new Departure
+                        CarrierCode = s.CarrierCode,
+                        Number = s.Number,
+                        Departure = new Departure
                         {
-                            iataCode = s.Origin.ToString(),
-                            at = s.Departure
+                            IataCode = s.Origin.ToString(),
+                            At = s.Departure
                         },
-                        arrival = new Arrival
+                        Arrival = new Arrival
                         {
-                            iataCode = s.Destination.Value.ToString(),
-                            at = s.Departure
+                            IataCode = s.Destination.Value.ToString(),
+                            At = s.Departure
                         },
-                        id = s.Id
+                        Id = s.Id
                     }).ToArray()
                 }
             ],
-            travelerPricings = flight.TravelerPricings.Select(t => t.ToAmadeusTravelerPricing()).ToArray(),
-            source = flight.Source,
-            validatingAirlineCodes = flight.ValidatingAirlineCodes.ToArray()
+            TravelerPricings = flight.TravelerPricings.Select(t => t.ToAmadeusTravelerPricing()).ToArray(),
+            Source = flight.Source,
+            ValidatingAirlineCodes = flight.ValidatingAirlineCodes.ToArray()
         };
     }
 
     private static TravelerPricing ToTravelerPricing(this Travelerpricing travelerpricing)
     {
-        return new TravelerPricing(travelerpricing.travelerId, travelerpricing.fareOption, travelerpricing.travelerType, 
-            new Models.Price(decimal.Parse(travelerpricing.price.total), travelerpricing.price.currency, decimal.Parse(travelerpricing.price._base)),
-            travelerpricing.fareDetailsBySegment.Select(d => d.ToFareDetailBySegment()).ToList());
+        return new TravelerPricing(travelerpricing.TravelerId, travelerpricing.FareOption, travelerpricing.TravelerType, 
+            new Models.Price(decimal.Parse(travelerpricing.Price.Total), travelerpricing.Price.Currency, decimal.Parse(travelerpricing.Price.Base)),
+            travelerpricing.FareDetailsBySegment.Select(d => d.ToFareDetailBySegment()).ToList());
     }
 
     private static Travelerpricing ToAmadeusTravelerPricing(this TravelerPricing travelerPricing)
     {
         return new Travelerpricing
         {
-            travelerId = travelerPricing.TravelerId,
-            fareOption = travelerPricing.FareOption,
-            travelerType = travelerPricing.TravelerType,
-            price = new Price1
+            TravelerId = travelerPricing.TravelerId,
+            FareOption = travelerPricing.FareOption,
+            TravelerType = travelerPricing.TravelerType,
+            Price = new Price1
             {
-                total = travelerPricing.Price.Total.ToString(),
-                currency = travelerPricing.Price.Currency,
-                _base = travelerPricing.Price.Base.ToString()
+                Total = travelerPricing.Price.Total.ToString(),
+                Currency = travelerPricing.Price.Currency,
+                Base = travelerPricing.Price.Base.ToString()
             },
-            fareDetailsBySegment = travelerPricing.FareDetails.Select(d => d.ToAmadeusFareDetailBySegment()).ToArray()
+            FareDetailsBySegment = travelerPricing.FareDetails.Select(d => d.ToAmadeusFareDetailBySegment()).ToArray()
         };
     }
 
     private static FareDetailBySegment ToFareDetailBySegment(this Faredetailsbysegment amadeusFareDetails)
     {
         return new FareDetailBySegment(
-            amadeusFareDetails.segmentId,
-            amadeusFareDetails.cabin,
-            amadeusFareDetails.fareBasis,
-            amadeusFareDetails.brandedFare,
-            amadeusFareDetails._class,
-            amadeusFareDetails.includedCheckedBags.quantity
+            amadeusFareDetails.SegmentId,
+            amadeusFareDetails.Cabin,
+            amadeusFareDetails.FareBasis,
+            amadeusFareDetails.BrandedFare,
+            amadeusFareDetails.Class,
+            amadeusFareDetails.IncludedCheckedBags.Quantity
         );
     }
 
@@ -108,14 +108,14 @@ public static class AmadeusModelExtensions
     {
         return new Faredetailsbysegment()
         {
-            segmentId = fareDetail.SegmentId,
-            cabin = fareDetail.Cabin,
-            fareBasis = fareDetail.FareBasis,
-            brandedFare = fareDetail.BrandedFare,
-            _class = fareDetail.Class,
-            includedCheckedBags = new Includedcheckedbags
+            SegmentId = fareDetail.SegmentId,
+            Cabin = fareDetail.Cabin,
+            FareBasis = fareDetail.FareBasis,
+            BrandedFare = fareDetail.BrandedFare,
+            Class = fareDetail.Class,
+            IncludedCheckedBags = new Includedcheckedbags
             {
-                quantity = fareDetail.IncludedCheckedBags
+                Quantity = fareDetail.IncludedCheckedBags
             }
         };
     }

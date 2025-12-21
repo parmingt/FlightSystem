@@ -14,8 +14,8 @@ internal class AmadeusClientFake : IAmadeusClient
 
     public Task<List<OffersSearch.Offers>> BookFlight(FlightOrder order)
     {
-        BookedOffers.AddRange(order.flightOffers);
-        return Task.FromResult(order.flightOffers);
+        BookedOffers.AddRange(order.FlightOffers);
+        return Task.FromResult(order.FlightOffers);
     }
 
     public Task<List<OffersSearch.Offers>> SearchFlightsAsync(string origin, string destination, DateTime departure, int numAdults = 1)

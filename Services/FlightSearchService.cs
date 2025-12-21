@@ -35,7 +35,7 @@ public class FlightSearchService
     {
         var amadeusOffer = flight.ToOffer();
         var confirmation = await routesClient.ConfirmFlightOffer(new List<AmadeusSDK.Models.OffersSearch.Offers> { amadeusOffer });
-        return confirmation.First().price.total == amadeusOffer.price.total;
+        return confirmation.First().Price.Total == amadeusOffer.Price.Total;
     }
 
     //public async Task<BookedFlight> BookFlight(FlightOffer flight)

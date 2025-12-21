@@ -38,7 +38,7 @@ public class UnitTests
                StatusCode = HttpStatusCode.OK,
                Content = JsonContent.Create(new FlightOffersResponse()
                {
-                   data = new Offers[] { new Offers() }
+                   Data = new Offers[] { new Offers() }
                })
            })
            .Verifiable();

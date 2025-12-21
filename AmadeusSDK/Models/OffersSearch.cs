@@ -11,165 +11,161 @@ public class OffersSearch
 {
     public class FlightOffersResponse
     {
-        public Meta meta { get; set; }
-        public Offers[] data { get; set; }
+        public Meta MetaData { get; set; }
+        public Offers[] Data { get; set; }
     }
 
     public class Meta
     {
-        public int count { get; set; }
-        public Links links { get; set; }
+        public int Count { get; set; }
+        public Links Links { get; set; }
     }
 
     public class Links
     {
-        public string self { get; set; }
+        public string Self { get; set; }
     }
 
     public class Offers
     {
-        public string type { get; set; }
-        public string id { get; set; }
-        public string source { get; set; }
-        public bool instantTicketingRequired { get; set; }
-        public bool nonHomogeneous { get; set; }
-        public bool oneWay { get; set; }
-        public bool isUpsellOffer { get; set; }
-        public string lastTicketingDate { get; set; }
-        public string lastTicketingDateTime { get; set; }
-        public int numberOfBookableSeats { get; set; }
-        public Itinerary[] itineraries { get; set; }
-        public Price price { get; set; }
-        public Pricingoptions pricingOptions { get; set; }
-        public string[] validatingAirlineCodes { get; set; }
-        public Travelerpricing[] travelerPricings { get; set; }
+        public string Type { get; set; }
+        public string Id { get; set; }
+        public string Source { get; set; }
+        public bool InstantTicketingRequired { get; set; }
+        public bool NonHomogeneous { get; set; }
+        public bool OneWay { get; set; }
+        public bool IsUpsellOffer { get; set; }
+        public string LastTicketingDate { get; set; }
+        public string LastTicketingDateTime { get; set; }
+        public int NumberOfBookableSeats { get; set; }
+        public Itinerary[] Itineraries { get; set; }
+        public Price Price { get; set; }
+        public Pricingoptions PricingOptions { get; set; }
+        public string[] ValidatingAirlineCodes { get; set; }
+        public Travelerpricing[] TravelerPricings { get; set; }
     }
 
     public class Price
     {
-        public string currency { get; set; }
-        public string total { get; set; }
+        public string Currency { get; set; }
+        public string Total { get; set; }
 
         [JsonPropertyName("base")]
-        public string? _base { get; set; }
-        public Fee[] fees { get; set; }
-        public string grandTotal { get; set; }
+        public string? Base { get; set; }
+        public Fee[] Fees { get; set; }
+        public string GrandTotal { get; set; }
     }
 
     public class Fee
     {
-        public string amount { get; set; }
-        public string type { get; set; }
+        public string Amount { get; set; }
+        public string Type { get; set; }
     }
 
     public class Pricingoptions
     {
-        public string[] fareType { get; set; }
-        public bool includedCheckedBagsOnly { get; set; }
+        public string[] FareType { get; set; }
+        public bool IncludedCheckedBagsOnly { get; set; }
     }
 
     public class Itinerary
     {
-        public string duration { get; set; }
-        public Segment[] segments { get; set; }
+        public string Duration { get; set; }
+        public Segment[] Segments { get; set; }
     }
 
     public class Segment
     {
-        public Departure departure { get; set; }
-        public Arrival arrival { get; set; }
-        public string carrierCode { get; set; }
-        public string number { get; set; }
-        public Aircraft1 aircraft { get; set; }
-        public Operating operating { get; set; }
-        public string duration { get; set; }
-        public string id { get; set; }
-        public int numberOfStops { get; set; }
-        public bool blacklistedInEU { get; set; }
-        public Stop[]? stops { get; set; }
+        public Departure Departure { get; set; }
+        public Arrival Arrival { get; set; }
+        public string CarrierCode { get; set; }
+        public string Number { get; set; }
+        public Aircraft1 Aircraft { get; set; }
+        public Operating Operating { get; set; }
+        public string Duration { get; set; }
+        public string Id { get; set; }
+        public int NumberOfStops { get; set; }
+        public bool BlacklistedInEU { get; set; }
+        public Stop[]? Stops { get; set; }
     }
 
     public class Departure
     {
-        public string iataCode { get; set; }
-        public string? terminal { get; set; }
-        public DateTime at { get; set; }
+        public string IataCode { get; set; }
+        public string? Terminal { get; set; }
+        public DateTime At { get; set; }
     }
 
     public class Arrival
     {
-        public string iataCode { get; set; }
-        public string? terminal { get; set; }
-        public DateTime at { get; set; }
+        public string IataCode { get; set; }
+        public string? Terminal { get; set; }
+        public DateTime At { get; set; }
     }
 
     public class Aircraft1
     {
-        public string code { get; set; }
+        public string Code { get; set; }
     }
 
     public class Operating
     {
-        public string carrierCode { get; set; }
+        public string CarrierCode { get; set; }
     }
 
     public class Stop
     {
-        public string iataCode { get; set; }
-        public string duration { get; set; }
-        public DateTime arrivalAt { get; set; }
-        public DateTime departureAt { get; set; }
+        public string IataCode { get; set; }
+        public string Duration { get; set; }
+        public DateTime ArrivalAt { get; set; }
+        public DateTime DepartureAt { get; set; }
     }
 
     public class Travelerpricing
     {
-        public string travelerId { get; set; }
-        public string fareOption { get; set; }
-        public string travelerType { get; set; }
-        public Price1 price { get; set; }
-        public Faredetailsbysegment[] fareDetailsBySegment { get; set; }
+        public string TravelerId { get; set; }
+        public string FareOption { get; set; }
+        public string TravelerType { get; set; }
+        public Price1 Price { get; set; }
+        public Faredetailsbysegment[] FareDetailsBySegment { get; set; }
     }
 
     public class Price1
     {
-        public string currency { get; set; }
-        public string total { get; set; }
-
-        [JsonPropertyName("base")]
-        public string _base { get; set; }
+        public string Currency { get; set; }
+        public string Total { get; set; }
+        public string Base { get; set; }
     }
 
     public class Faredetailsbysegment
     {
-        public string segmentId { get; set; }
-        public string cabin { get; set; }
-        public string fareBasis { get; set; }
-
-        [JsonPropertyName("class")]
-        public string _class { get; set; }
-        public Includedcheckedbags includedCheckedBags { get; set; }
-        public string brandedFare { get; set; }
-        public string brandedFareLabel { get; set; }
-        public Amenity[] amenities { get; set; }
-        public string sliceDiceIndicator { get; set; }
+        public string SegmentId { get; set; }
+        public string Cabin { get; set; }
+        public string FareBasis { get; set; }
+        public string Class { get; set; }
+        public Includedcheckedbags IncludedCheckedBags { get; set; }
+        public string BrandedFare { get; set; }
+        public string BrandedFareLabel { get; set; }
+        public Amenity[] Amenities { get; set; }
+        public string SliceDiceIndicator { get; set; }
     }
 
     public class Includedcheckedbags
     {
-        public int quantity { get; set; }
+        public int Quantity { get; set; }
     }
 
     public class Amenity
     {
-        public string description { get; set; }
-        public bool isChargeable { get; set; }
-        public string amenityType { get; set; }
-        public Amenityprovider amenityProvider { get; set; }
+        public string Description { get; set; }
+        public bool IsChargeable { get; set; }
+        public string AmenityType { get; set; }
+        public Amenityprovider AmenityProvider { get; set; }
     }
 
     public class Amenityprovider
     {
-        public string name { get; set; }
+        public string Name { get; set; }
     }
     public class AmadeusToken
     {
@@ -180,7 +176,7 @@ public class OffersSearch
         public string token_type { get; set; }
         public string access_token { get; set; }
         public int expires_in { get; set; }
-        public string state { get; set; }
-        public string scope { get; set; }
+        public string State { get; set; }
+        public string Scope { get; set; }
     }
 }

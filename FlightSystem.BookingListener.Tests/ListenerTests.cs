@@ -175,7 +175,7 @@ public sealed class ListenerTests
         }
 
         Assert.AreEqual(1, _amadeusClientFake.BookedOffers.Count);
-        Assert.AreEqual("10.0", _amadeusClientFake.BookedOffers[0].price.total);
+        Assert.AreEqual("10.0", _amadeusClientFake.BookedOffers[0].Price.Total);
     }
 
     [TestMethod]
@@ -194,6 +194,6 @@ public sealed class ListenerTests
         }
 
         Assert.AreEqual(1, _amadeusClientFake.BookedOffers.Count);
-        Assert.AreEqual("10.0", _amadeusClientFake.BookedOffers[0].price.total);
+        Assert.AreEqual("10.0", _amadeusClientFake.BookedOffers[0].Price.Total);
     }
 }

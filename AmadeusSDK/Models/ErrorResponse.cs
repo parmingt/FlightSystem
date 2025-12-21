@@ -8,14 +8,14 @@ namespace AmadeusSDK.Models
 {
     public class ErrorResponse
     {
-        public List<Error> errors { get; set; }
+        public List<Error> Errors { get; set; }
     }
 
     public class Error
     {
-        public int code { get; set; }
-        public string title { get; set; }
-        public string detail { get; set; }
-        public int status { get; set; }
+        public int Code { get; set; }
+        public string Title { get; set; }
+        public string Detail { get; set; }
+        public int StatusCode { get; set; }
     }
 }

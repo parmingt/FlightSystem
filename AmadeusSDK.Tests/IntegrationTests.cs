@@ -41,7 +41,7 @@ public sealed class IntegrationTests
         var confirmation = await client.ConfirmFlightOffer(offers);
 
         Assert.IsTrue(confirmation.Any());
-        Assert.IsTrue(flights.First().price.total == confirmation.First().price.total);
+        Assert.IsTrue(flights.First().Price.Total == confirmation.First().Price.Total);
     }
 
     [TestMethod]
@@ -59,27 +59,27 @@ public sealed class IntegrationTests
         var confirmedOffer = await client.ConfirmFlightOffer([flights[2]]);
         var order = new FlightOrder()
         {
-            flightOffers = new List<Offers> { confirmedOffer.First() },
-            travelers = new List<Traveler>()
+            FlightOffers = new List<Offers> { confirmedOffer.First() },
+            Travelers = new List<Traveler>()
             {
                 new Traveler()
                 {
-                    id = "1",
-                    dateOfBirth = "1990-10-28",
-                    name = new Name()
+                    Id = "1",
+                    DateOfBirth = "1990-10-28",
+                    Name = new Name()
                     {
-                        firstName = "Peter",
-                        lastName = "Armington"
+                        FirstName = "Peter",
+                        LastName = "Armington"
                     },
-                    gender = "MALE",
-                    contact = new Contact()
+                    Gender = "MALE",
+                    Contact = new Contact()
                     {
-                        emailAddress = "jorge.gonzales833@telefonica.es",
-                        phones = [
+                        EmailAddress = "jorge.gonzales833@telefonica.es",
+                        Phones = [
                             new Phone() {
-                                deviceType = "MOBILE",
-                                countryCallingCode = "34",
-                                number = "480080076"
+                                DeviceType = "MOBILE",
+                                CountryCallingCode = "34",
+                                Number = "480080076"
                             }
                         ]
                     }
@@ -89,6 +89,6 @@ public sealed class IntegrationTests
         var confirmation = await client.BookFlight(order);
 
         Assert.IsTrue(confirmation.Any());
-        Assert.IsTrue(confirmation.First().price.total == confirmation.First().price.total);
+        Assert.IsTrue(confirmation.First().Price.Total == confirmation.First().Price.Total);
     }
 }
