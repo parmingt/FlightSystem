@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Models = FlightSystem.Services.Models;
 using Data = FlightSystem.Data;
 using Microsoft.Extensions.Caching.Memory;
+using System.Data;
 
 namespace FlightsSystem.Services.Tests;
 
@@ -68,10 +69,13 @@ public class BookingServiceTests
 
         try
         {
-            await Task.WhenAll(bookLaxFlight(), bookLaxFlight());
+            var task1 = Task.Run(bookLaxFlight);
+            await Task.Delay(10); // Slight delay to increase chance of concurrency conflict
+            var task2 = Task.Run(bookLaxFlight);
+            await Task.WhenAll(task1, task2);
             Assert.Fail("Expected concurrency exception not thrown");
         }
-        catch (DbUpdateConcurrencyException){ }
+        catch (DbUpdateConcurrencyException) { }
 
         var bookings = context.Bookings.Include(b => b.Price).ToList();
         Assert.AreEqual(1, bookings.Count);
@@ -82,9 +86,9 @@ public class BookingServiceTests
 
             await service.BookFlight(new FlightOffer(
                 DateTime.UtcNow,
-                new FlightSystem.Services.Models.Price(300m, "USD", 300m),
+                new Models.Price(300m, "USD", 300m),
                 [
-                    new FlightSystem.Services.Models.Segment("AA", "100"
+                    new Models.Segment("AA", "100"
                         , new IataCode("JFK"), new IataCode("LAX"), DateTime.UtcNow.AddDays(1), "seg1")
                 ],
                 "",

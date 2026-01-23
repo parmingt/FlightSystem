@@ -27,9 +27,10 @@ public class BookingService
         // Create segments in db
         var segments = selectedFlight.Segments.Select(segment => 
             context.Segments.Include(s => s.Seats).FirstOrDefault(s =>
-            segment.CarrierCode == s.CarrierCode &&
-            segment.Number == s.Number &&
-            segment.Departure.Date == s.Departure.Date)).Where(s => s is not null).ToList();
+                segment.CarrierCode == s.CarrierCode &&
+                segment.Number == s.Number &&
+                segment.Departure.Date == s.Departure.Date))
+            .Where(s => s is not null);
 
         var segmentsToCreate = selectedFlight.Segments
             .Where(s => !segments.Any(es =>
@@ -51,9 +52,6 @@ public class BookingService
         }).ToList();
         context.Segments.AddRange(segmentsToCreate);
 
-        segments.AddRange(segmentsToCreate);
-        await context.SaveChangesAsync();
-
         var newBooking = new Data.Booking()
         {
             Price = new Data.Price()
@@ -65,12 +63,11 @@ public class BookingService
             BookingDate = DateTime.UtcNow
         };
         context.Bookings.Add(newBooking);
-        segments.SelectMany(s => s.Seats).ToList()
-            .ForEach(seat => {
-                seat.Booking = newBooking;
-                seat.Version++;
-            });
-        await Task.Delay(100);
+        foreach (var seat in segments.SelectMany(s => s.Seats))
+        {
+            seat.Booking = newBooking;
+            seat.Version++;
+        }
         await context.SaveChangesAsync();
     }
 
