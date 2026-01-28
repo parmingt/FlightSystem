@@ -76,21 +76,35 @@ public class AmadeusClient : IAmadeusClient
         return confirmedOffers.Data.FlightOffers;
     }
 
-    public async Task<List<Offers>> BookFlight(FlightOrder order)
+    public async Task<FlightOrder> BookFlight(FlightOrder order)
     {
         var client = await GetClientWithTokenAsync();
         var endpoint = $"v1/booking/flight-orders";
 
+        order.Travelers = [
+                    new Traveler(){
+                        Id = "1",
+                        Name = new Name(){
+                            FirstName = "John",
+                            LastName = "Doe"
+                        },
+                        Contact = new Contact() {
+                            EmailAddress = "test@gmail.com"
+                        },
+                        Gender = "MALE",
+                        DateOfBirth = "1990-01-01"
+                    }
+                ];
         var request = new DataWrapper<FlightOrder>(order);
         var requestJson = JsonSerializer.Serialize(request);
         var response = await client.PostAsJsonAsync(endpoint, request);
 
         if (!await IsSuccessful(response, request))
-            return [];
+            throw new Exception("Failed to book flight");
 
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<DataWrapper<FlightOrder>>(json, jsonOptions);
-        return confirmedOffers.Data.FlightOffers;
+        return confirmedOffers.Data;
     }
 
     public async Task<string> GetTokenAsync()

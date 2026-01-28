@@ -38,18 +38,10 @@ public class FlightSearchService
         return confirmation.First().Price.Total == amadeusOffer.Price.Total;
     }
 
-    //public async Task<BookedFlight> BookFlight(FlightOffer flight)
-    //{
-    //    var order = new FlightOrder()
-    //    {
-    //        flightOffers = [flight]
-    //    };
-    //    await producer.ProduceAsync("flight-orders", new Message<string, FlightOrder>
-    //    {
-    //        Key = "flight-order",
-    //        Value = order
-    //    });
-
-    //    return new BookedFlight(flight, DateTime.UtcNow);
-    //}
+    public async Task<BookedFlight> BookFlight(FlightOffer flight)
+    {
+        var amadeusOffer = flight.ToOffer();
+        var confirmation = await routesClient.BookFlight(new AmadeusSDK.Models.FlightOrder() { FlightOffers = new List<AmadeusSDK.Models.OffersSearch.Offers> { amadeusOffer } });
+        return new BookedFlight(flight, DateTime.Now, confirmation.Id);
+    }
 }

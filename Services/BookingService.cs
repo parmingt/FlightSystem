@@ -24,13 +24,15 @@ public class BookingService
             return;
         }
 
+        var booking = await flightSearchService.BookFlight(selectedFlight);
+
         // Create segments in db
-        var segments = selectedFlight.Segments.Select(segment => 
+        var segments = selectedFlight.Segments.Select(segment =>
             context.Segments.Include(s => s.Seats).FirstOrDefault(s =>
                 segment.CarrierCode == s.CarrierCode &&
                 segment.Number == s.Number &&
                 segment.Departure.Date == s.Departure.Date))
-            .Where(s => s is not null);
+            .Where(s => s is not null).ToList();
 
         var segmentsToCreate = selectedFlight.Segments
             .Where(s => !segments.Any(es =>
@@ -52,6 +54,7 @@ public class BookingService
         }).ToList();
         context.Segments.AddRange(segmentsToCreate);
 
+        await flightSearchService.BookFlight(selectedFlight);
         var newBooking = new Data.Booking()
         {
             Price = new Data.Price()
@@ -60,7 +63,8 @@ public class BookingService
                 Currency = context.Currency.First(c => c.Name == selectedFlight.Price.Currency)
             },
             Status = context.BookingStatus.First(s => s.Name == "Pending"),
-            BookingDate = DateTime.UtcNow
+            BookingDate = DateTime.UtcNow,
+            BookingId = booking.BookingId
         };
         context.Bookings.Add(newBooking);
         foreach (var seat in segments.SelectMany(s => s.Seats))

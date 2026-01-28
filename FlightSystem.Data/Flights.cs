@@ -107,6 +107,7 @@ public class Seat
 
     public required BookingStatus Status { get; set; }
     public required DateTime BookingDate { get; set; } = DateTime.MinValue;
+    public required string BookingId { get; set; }
 }
 
 public class Price

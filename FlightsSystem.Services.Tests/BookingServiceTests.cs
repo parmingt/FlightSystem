@@ -59,18 +59,22 @@ public class BookingServiceTests
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }
 
-    [TestMethod]
-    public async Task QueryDatabase()
+    [TestInitialize]
+    public void TestInitialize()
     {
         var context = _serviceProvider.GetRequiredService<FlightContext>();
         context.Seats.ToList().ForEach(s => s.Booking = null);
         context.Bookings.RemoveRange(context.Bookings);
         context.SaveChanges();
+    }
 
+    [TestMethod]
+    public async Task PreventDoubleBooking()
+    {
+        var context = _serviceProvider.GetRequiredService<FlightContext>();
         try
         {
             var task1 = Task.Run(bookLaxFlight);
-            await Task.Delay(10); // Slight delay to increase chance of concurrency conflict
             var task2 = Task.Run(bookLaxFlight);
             await Task.WhenAll(task1, task2);
             Assert.Fail("Expected concurrency exception not thrown");
