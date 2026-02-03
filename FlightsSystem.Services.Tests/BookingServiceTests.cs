@@ -13,6 +13,7 @@ using Models = FlightSystem.Services.Models;
 using Data = FlightSystem.Data;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FlightsSystem.Services.Tests;
 
@@ -24,27 +25,6 @@ public class BookingServiceTests
     [ClassInitialize]
     public static void Initialize(TestContext testContext)
     {
-
-        // These options will be used by the context instances in this test suite, including the connection opened above.
-        var dbContextOptions = new DbContextOptionsBuilder<FlightContext>()
-            .UseNpgsql("Server=localhost;Port=5432;Database=Flights;User ID=postgres;password=postgres;timeout=1000");
-
-        // Create the schema and seed some data
-        using var context = new FlightContext(dbContextOptions.Options);
-        context.Database.EnsureCreated();
-        context.Seats.ExecuteDelete();
-        context.Segments.ExecuteDelete();
-        context.Segments.Add(new Data.Segment()
-        {
-            Origin = context.Airports.First(a => a.Code == "JFK"),
-            Destination = context.Airports.First(a => a.Code == "LAX"),
-            CarrierCode = "AA",
-            Number = "100",
-            Departure = DateTime.UtcNow.AddDays(1),
-            Seats = [new Seat() { Version = 1 }]
-        });
-        context.SaveChanges();
-
         var serviceCollection = TestHelpers.BuildServiceCollection();
         serviceCollection.AddDbContext<FlightContext>((_, optionsBuilder) =>
             optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=Flights;User ID=postgres;password=postgres;timeout=1000")
@@ -57,15 +37,28 @@ public class BookingServiceTests
             FakeAmadeusClient.CreateFakeClient(serviceProvider.GetRequiredService<IMemoryCache>()));
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
-    }
 
-    [TestInitialize]
-    public void TestInitialize()
-    {
         var context = _serviceProvider.GetRequiredService<FlightContext>();
-        context.Seats.ToList().ForEach(s => s.Booking = null);
+        context.Database.EnsureCreated();
+
+        context.Seats.ExecuteDelete();
+        context.Segments.ExecuteDelete();
+        context.Segments.Add(new Data.Segment()
+        {
+            Origin = context.Airports.First(a => a.Code == "JFK"),
+            Destination = context.Airports.First(a => a.Code == "LAX"),
+            CarrierCode = "AA",
+            Number = "100",
+            Departure = DateTime.UtcNow.AddDays(1),
+            Seats = [new Seat() { Version = 1 }]
+        });
         context.Bookings.RemoveRange(context.Bookings);
         context.SaveChanges();
+    }
+
+    [ClassCleanup]
+    public static void ClassCleanup()
+    {
     }
 
     [TestMethod]
