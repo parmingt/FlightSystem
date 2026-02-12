@@ -79,30 +79,18 @@ public class BookingService
         await context.SaveChangesAsync();
     }
 
-    public async Task<List<BookedFlight>> GetBookings()
+    public async Task<List<Models.BookedFlightSummary>> GetBookings()
     {
         var bookings = await context.Bookings
-            //.Include(b => b.Segments).ThenInclude(s => s.Origin)
-            //.Include(b => b.Segments).ThenInclude(s => s.Destination)
-            //.Include(b => b.Price).ThenInclude(p => p.Currency)
+            .Include(b => b.Seats).ThenInclude(s => s.Segment).ThenInclude(s => s.Origin)
+            .Include(b => b.Seats).ThenInclude(s => s.Segment).ThenInclude(s => s.Destination)
+            .Include(b => b.Price).ThenInclude(p => p.Currency)
+            .Select(b => new Models.BookedFlightSummary(b.BookingDate, b.BookingId ?? ""
+                , new IataCode(b.Seats.OrderBy(s => s.Segment.Departure).First().Segment.Origin.Code)
+                , new IataCode(b.Seats.OrderBy(s => s.Segment.Departure).Last().Segment.Destination.Code)
+                , new Models.Price(100, "USD", 100)))
         .ToListAsync();
 
-        if (bookings is null)
-            return new();
-
-        return [];
-        //return bookings.Select(b => 
-        //    new BookedFlight(new FlightOffer(
-        //        b.Segments.First().Departure,
-        //        new Models.Price(b.Price.Total, b.Price.Currency.Name, 0),
-        //        b.Segments.Select(s => 
-        //            new Models.Segment("test", "11"
-        //                , new IataCode(s.Origin.Code)
-        //                , new IataCode(s.Destination.Code)
-        //                , s.Departure
-        //                , "")
-        //            ).ToList() 
-        //        , "", [], "", []), b.BookingDate))
-        //    .ToList();
+        return bookings;
     }
 }

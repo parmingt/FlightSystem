@@ -95,9 +95,10 @@ public class Seat
     public Guid? Id { get; set; }
     public int Version { get; set; }
     public Booking? Booking { get; set; }
+    public virtual Segment? Segment { get; set; }
 }
 
-    public class Booking
+public class Booking
 {
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
@@ -108,6 +109,7 @@ public class Seat
     public required BookingStatus Status { get; set; }
     public required DateTime BookingDate { get; set; } = DateTime.MinValue;
     public string? BookingId { get; set; }
+    public virtual List<Seat> Seats { get; set; } = [];
 }
 
 public class Price

@@ -38,10 +38,10 @@ public class FlightSearchService
         return confirmation.First().Price.Total == amadeusOffer.Price.Total;
     }
 
-    public async Task<BookedFlight> BookFlight(FlightOffer flight)
+    public async Task<Models.Booking> BookFlight(FlightOffer flight)
     {
         var amadeusOffer = flight.ToOffer();
         var confirmation = await routesClient.BookFlight(new AmadeusSDK.Models.FlightOrder() { FlightOffers = new List<AmadeusSDK.Models.OffersSearch.Offers> { amadeusOffer } });
-        return new BookedFlight(flight, DateTime.Now, confirmation.Id);
+        return new Models.Booking(flight, DateTime.Now, confirmation.Id);
     }
 }

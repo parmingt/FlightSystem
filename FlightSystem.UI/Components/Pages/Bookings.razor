@@ -7,7 +7,7 @@
 <h3>Bookings</h3>
 @if (!loading)
 {
-    <Grid TItem="BookedFlight"
+    <Grid TItem="BookedFlightSummary"
           Class="table table-hover table-bordered table-striped"
           Data="bookings"
           Responsive="true"
@@ -15,20 +15,17 @@
           AllowRowClick="true">
 
         <GridColumns>
-            <GridColumn TItem="BookedFlight" HeaderText="Origin" SortKeySelector="item => item.Flight.Segments.FirstOrDefault().Origin.ToString()">
-                @context.Flight.Segments?.FirstOrDefault()?.Origin.ToString()
+            <GridColumn TItem="BookedFlightSummary" HeaderText="Origin" SortKeySelector="item => item.Origin.ToString()">
+                @context.Origin.ToString()
             </GridColumn>
-            <GridColumn TItem="BookedFlight" HeaderText="Destination">
-                @context.Flight.Segments?.LastOrDefault()?.Destination.ToString()
+            <GridColumn TItem="BookedFlightSummary" HeaderText="Destination">
+                @context.Destination.ToString()
             </GridColumn>
-            <GridColumn TItem="BookedFlight" HeaderText="Departure">
-                @context.Flight.Segments?.FirstOrDefault()?.Departure
-            </GridColumn>
-            <GridColumn TItem="BookedFlight" HeaderText="Booked On">
+            <GridColumn TItem="BookedFlightSummary" HeaderText="Booked On">
                 @context.BookingDate
             </GridColumn>
-            <GridColumn TItem="BookedFlight" HeaderText="Price">
-                @context.Flight.Price.Total @context.Flight.Price.Currency
+            <GridColumn TItem="BookedFlightSummary" HeaderText="Price">
+                @context.Price.Total @context.Price.Currency
             </GridColumn>
         </GridColumns>
 
@@ -41,7 +38,7 @@ else
 
 @code {
     private bool loading = true;
-    private List<BookedFlight> bookings = new();
+    private List<BookedFlightSummary> bookings = new();
 
     protected override async Task OnInitializedAsync()
     {
