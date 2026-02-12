@@ -60,7 +60,8 @@ public class BookingService
                 Currency = context.Currency.First(c => c.Name == selectedFlight.Price.Currency)
             },
             Status = context.BookingStatus.First(s => s.Name == "Pending"),
-            BookingDate = DateTime.UtcNow
+            BookingDate = DateTime.UtcNow,
+            Seats = context.Segments.SelectMany(s => s.Seats).ToList().Concat(segmentsToCreate.SelectMany(s => s.Seats)).ToList()
         };
         context.Bookings.Add(newBooking);
         foreach (var seat in segments.SelectMany(s => s.Seats))
