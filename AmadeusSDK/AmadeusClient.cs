@@ -4,6 +4,7 @@ using Serilog;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using static AmadeusSDK.Models.OffersSearch;
 
@@ -76,7 +77,7 @@ public class AmadeusClient : IAmadeusClient
         return confirmedOffers.Data.FlightOffers;
     }
 
-    public async Task<FlightOrder> BookFlight(FlightOrder order)
+    public async Task<SuccessWrapper<FlightOrder>> BookFlight(FlightOrder order)
     {
         var client = await GetClientWithTokenAsync();
         var endpoint = $"v1/booking/flight-orders";
@@ -99,12 +100,13 @@ public class AmadeusClient : IAmadeusClient
         var requestJson = JsonSerializer.Serialize(request);
         var response = await client.PostAsJsonAsync(endpoint, request);
 
-        if (!await IsSuccessful(response, request))
-            throw new Exception("Failed to book flight");
+        var (success, error) = await IsSuccessful(response, request);
+        if (!success)
+            return new SuccessWrapper<FlightOrder>(error);
 
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<DataWrapper<FlightOrder>>(json, jsonOptions);
-        return confirmedOffers.Data;
+        return new SuccessWrapper<FlightOrder>(confirmedOffers.Data);
     }
 
     public async Task<string> GetTokenAsync()
@@ -138,17 +140,18 @@ public class AmadeusClient : IAmadeusClient
         return httpClient;
     }
 
-    private async Task<bool> IsSuccessful<TRequest>(HttpResponseMessage response, DataWrapper<TRequest>? request = null)
+    private async Task<(bool Success, string Error)> IsSuccessful<TRequest>(HttpResponseMessage response, DataWrapper<TRequest>? request = null)
     {
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync();
-            var errors = JsonSerializer.Deserialize<ErrorResponse>(errorContent);
+            var error = JsonSerializer.Deserialize<ErrorResponse>(errorContent, jsonOptions);
             logger.ForContext("ResponseContent", errorContent)
                 .ForContext("RequestData", JsonSerializer.Serialize(request))
                 .Error("Error confirming flight offers: {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
+            return (false, error.Errors.First().Title);
         }
-        return response.IsSuccessStatusCode;
+        return (response.IsSuccessStatusCode, null);
     }
 
 }

@@ -12,6 +12,7 @@
 
 <h3>BookFlight</h3>
 
+<Toasts class="p-3" Messages="messages" Placement="ToastsPlacement.TopRight" />
 <div class="row">
     <div class="col-md-5 col-sm-12">
         <AutoComplete @bind-Value="originSearchText"
@@ -81,6 +82,7 @@ else
     private DateOnly travelDate = DateOnly.FromDateTime(DateTime.Now.AddDays(7));
     private List<FlightOffer> matchingFlights = new();
     private bool loading = false;
+    List<ToastMessage> messages = new List<ToastMessage>();
 
     private async Task<AutoCompleteDataProviderResult<Airport>> AirportsDataProvider(AutoCompleteDataProviderRequest<Airport> request)
     {
@@ -148,7 +150,12 @@ else
 
     private async Task OnRowClick(GridRowEventArgs<FlightOffer> args)
     {
-        await bookingService.BookFlight(args.Item);
+        var message = await bookingService.BookFlight(args.Item);
+        if (message is not null)
+        {
+            ShowMessage(ToastType.Danger, message);
+            return;
+        };
         NavigationManager.NavigateTo("bookings");
     }
 
@@ -168,4 +175,15 @@ else
             
         }
     }
+
+    private void ShowMessage(ToastType toastType, string message) => messages.Add(CreateToastMessage(toastType, message));
+
+    private ToastMessage CreateToastMessage(ToastType toastType, string message)
+    => new ToastMessage
+        {
+            Type = toastType,
+            Title = "Blazor Bootstrap",
+            HelpText = $"{DateTime.Now}",
+            Message = message,
+        };
 }

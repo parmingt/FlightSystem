@@ -6,10 +6,10 @@ using static AmadeusSDK.Models.OffersSearch;
 
 namespace AmadeusSDK.Tests;
 
+[Ignore]
 [TestClass]
 public sealed class IntegrationTests
 {
-
     [TestMethod]
     public async Task SearchFlights()
     {

@@ -95,7 +95,7 @@ public class Seat
     public Guid? Id { get; set; }
     public int Version { get; set; }
     public Booking? Booking { get; set; }
-    public virtual Segment? Segment { get; set; }
+    public virtual Segment Segment { get; set; }
 }
 
 public class Booking

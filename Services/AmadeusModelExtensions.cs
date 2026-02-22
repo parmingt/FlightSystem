@@ -100,7 +100,7 @@ public static class AmadeusModelExtensions
             amadeusFareDetails.FareBasis,
             amadeusFareDetails.BrandedFare,
             amadeusFareDetails.Class,
-            amadeusFareDetails.IncludedCheckedBags.Quantity
+            amadeusFareDetails.IncludedCheckedBags?.Quantity
         );
     }
 
@@ -113,10 +113,10 @@ public static class AmadeusModelExtensions
             FareBasis = fareDetail.FareBasis,
             BrandedFare = fareDetail.BrandedFare,
             Class = fareDetail.Class,
-            IncludedCheckedBags = new Includedcheckedbags
+            IncludedCheckedBags = fareDetail.IncludedCheckedBags.HasValue && fareDetail.IncludedCheckedBags.Value > 0  ? new Includedcheckedbags
             {
-                Quantity = fareDetail.IncludedCheckedBags
-            }
+                Quantity = fareDetail.IncludedCheckedBags.Value
+            } : null
         };
     }
 }

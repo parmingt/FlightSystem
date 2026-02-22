@@ -16,6 +16,6 @@ namespace AmadeusSDK.Models
         public int Code { get; set; }
         public string Title { get; set; }
         public string Detail { get; set; }
-        public int StatusCode { get; set; }
+        public int Status { get; set; }
     }
 }
