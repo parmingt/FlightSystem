@@ -39,7 +39,7 @@ public class AmadeusClient : IAmadeusClient
         var endpoint = $"v2/shopping/flight-offers?originLocationCode={origin}&destinationLocationCode={destination}&departureDate={formattedDate}&adults={numAdults}&currencyCode=USD";
         var response = await client.GetAsync(endpoint);
 
-        await IsSuccessful<bool>(response);
+        await IsSuccessful(response);
 
         try
         {
@@ -55,7 +55,7 @@ public class AmadeusClient : IAmadeusClient
         }
     }
 
-    public async Task<List<Offers>> ConfirmFlightOffer(List<Offers> offersToConfirm)
+    public async Task<SuccessWrapper<List<Offers>>> ConfirmFlightOffer(List<Offers> offersToConfirm)
     {
         var client = await GetClientWithTokenAsync();
         var endpoint = $"v1/shopping/flight-offers/pricing";
@@ -70,11 +70,14 @@ public class AmadeusClient : IAmadeusClient
         };
 
         var response = await client.PostAsJsonAsync(endpoint, request);
-        await IsSuccessful<bool>(response);
+
+        var (success, error) = await IsSuccessful(response, request);
+        if (!success)
+            return new SuccessWrapper<List<Offers>>(error);
 
         var json = await response.Content.ReadAsStringAsync();
         var confirmedOffers = JsonSerializer.Deserialize<PricingConfirmation>(json, jsonOptions);
-        return confirmedOffers.Data.FlightOffers;
+        return new SuccessWrapper<List<Offers>>(confirmedOffers.Data.FlightOffers);
     }
 
     public async Task<SuccessWrapper<FlightOrder>> BookFlight(FlightOrder order)
@@ -140,18 +143,22 @@ public class AmadeusClient : IAmadeusClient
         return httpClient;
     }
 
-    private async Task<(bool Success, string Error)> IsSuccessful<TRequest>(HttpResponseMessage response, DataWrapper<TRequest>? request = null)
+    private async Task<(bool Success, string Error)> IsSuccessful<TRequest>(HttpResponseMessage response, TRequest? request)
     {
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync();
             var error = JsonSerializer.Deserialize<ErrorResponse>(errorContent, jsonOptions);
             logger.ForContext("ResponseContent", errorContent)
-                .ForContext("RequestData", JsonSerializer.Serialize(request))
+                .ForContext("RequestData", JsonSerializer.Serialize(request ?? new object()))
                 .Error("Error confirming flight offers: {StatusCode} - {ReasonPhrase}", response.StatusCode, response.ReasonPhrase);
             return (false, error.Errors.First().Title);
         }
         return (response.IsSuccessStatusCode, null);
     }
 
+    private async Task<(bool Success, string Error)> IsSuccessful(HttpResponseMessage response)
+    {
+        return await IsSuccessful<string>(response, null);
+    }
 }

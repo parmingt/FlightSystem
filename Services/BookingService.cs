@@ -61,10 +61,10 @@ public class BookingService
             },
             Status = context.BookingStatus.First(s => s.Name == "Pending"),
             BookingDate = DateTime.UtcNow,
-            Seats = context.Segments.SelectMany(s => s.Seats).ToList().Concat(segmentsToCreate.SelectMany(s => s.Seats)).ToList()
+            Seats = segments.SelectMany(s => s.Seats).Concat(segmentsToCreate.SelectMany(s => s.Seats)).ToList()
         };
         context.Bookings.Add(newBooking);
-        foreach (var seat in segments.SelectMany(s => s.Seats))
+        foreach (var seat in newBooking.Seats)
         {
             seat.Booking = newBooking;
             seat.Version++;
@@ -84,6 +84,7 @@ public class BookingService
     public async Task<List<Models.BookedFlightSummary>> GetBookings()
     {
         var bookings = await context.Bookings
+            .Where(b => b.Seats.Any())
             .Include(b => b.Seats).ThenInclude(s => s.Segment).ThenInclude(s => s.Origin)
             .Include(b => b.Seats).ThenInclude(s => s.Segment).ThenInclude(s => s.Destination)
             .Include(b => b.Price).ThenInclude(p => p.Currency)
