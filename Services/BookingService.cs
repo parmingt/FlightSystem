@@ -91,7 +91,7 @@ public class BookingService
             .Select(b => new Models.BookedFlightSummary(b.BookingDate, b.BookingId ?? ""
                 , new IataCode(b.Seats.OrderBy(s => s.Segment.Departure).First().Segment.Origin.Code)
                 , new IataCode(b.Seats.OrderBy(s => s.Segment.Departure).Last().Segment.Destination.Code)
-                , new Models.Price(100, "USD", 100)))
+                , new Models.Price(b.Price.Total, b.Price.Currency.Name, b.Price.Total)))
         .ToListAsync();
 
         return bookings;
