@@ -32,7 +32,8 @@ internal static class FakeAmadeusClient
                     response.Content = request.Content;
                 else if (request.RequestUri.ToString().Contains("v1/security/oauth2/token") && request.Method == HttpMethod.Post)
                     response.Content = new StringContent("{\"access_token\":\"fake_token\",\"token_type\":\"Bearer\",\"expires_in\":1799,\"state\":\"approved\"}", Encoding.UTF8, "application/json");
-
+                else if (request.RequestUri.ToString().Contains("v1/booking/flight-orders") && request.Method == HttpMethod.Post)
+                    response.Content = new StringContent("{\"data\":{\"id\":\"fake_booking_id\"}}", Encoding.UTF8, "application/json");
                 return response;
             })
             .Verifiable();

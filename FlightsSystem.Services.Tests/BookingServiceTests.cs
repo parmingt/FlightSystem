@@ -79,6 +79,7 @@ public class BookingServiceTests
 
         var bookings = context.Bookings.Include(b => b.Price).ToList();
         Assert.AreEqual(1, bookings.Count);
+        Assert.AreEqual("fake_booking_id", bookings.First().BookingId);
 
         async Task bookLaxFlight()
         {
