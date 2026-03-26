@@ -29,15 +29,10 @@ public class BookingServiceTests
         var serviceCollection = TestHelpers.BuildServiceCollection();
         var postgreSqlContainer = new PostgreSqlBuilder("postgres:15.1").Build();
         await postgreSqlContainer.StartAsync();
+
         serviceCollection.AddDbContext<FlightContext>((_, optionsBuilder) =>
             optionsBuilder.UseNpgsql(postgreSqlContainer.GetConnectionString())
             , ServiceLifetime.Transient);
-        serviceCollection.AddScoped<AirportsService>();
-        serviceCollection.AddScoped<FlightSearchService>();
-        serviceCollection.AddTransient<BookingService>();
-        serviceCollection.AddMemoryCache();
-        serviceCollection.AddTransient((serviceProvider) =>
-            FakeAmadeusClient.CreateFakeClient(serviceProvider.GetRequiredService<IMemoryCache>()));
 
         _serviceProvider = serviceCollection.BuildServiceProvider();
 

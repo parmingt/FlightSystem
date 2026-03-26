@@ -1,5 +1,6 @@
 ﻿using AmadeusSDK;
 using FlightSystem.Services;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
@@ -18,12 +19,13 @@ public static class TestHelpers
         var services = new ServiceCollection();
         services.AddMemoryCache();
         services.AddScoped<AirportsService>();
+        services.AddScoped<FlightSearchService>();
+        services.AddTransient<BookingService>();
         var builder = new ConfigurationBuilder();
-        // .AddJsonFile("appsettings.json");
         builder.AddUserSecrets(Assembly.GetExecutingAssembly(), true);
         IConfiguration configuration = builder.Build();
-        services.AddAmadeusClient(configuration["Amadeus:ClientId"]
-            , configuration["Amadeus:ClientSecret"]);
+        services.AddTransient((serviceProvider) =>
+            FakeAmadeusClient.CreateFakeClient(serviceProvider.GetRequiredService<IMemoryCache>()));
 
         services.AddScoped<IConfiguration>(_ => configuration);
         return services;
