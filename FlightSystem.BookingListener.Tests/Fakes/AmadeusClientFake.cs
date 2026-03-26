@@ -12,10 +12,10 @@ internal class AmadeusClientFake : IAmadeusClient
 {
     public readonly List<OffersSearch.Offers> BookedOffers = [];
 
-    public Task<FlightOrder> BookFlight(FlightOrder order)
+    public Task<SuccessWrapper<FlightOrder>> BookFlight(FlightOrder order)
     {
         BookedOffers.AddRange(order.FlightOffers);
-        return Task.FromResult(order);
+        return Task.FromResult(new SuccessWrapper<FlightOrder>(order));
     }
 
     public Task<List<OffersSearch.Offers>> SearchFlightsAsync(string origin, string destination, DateTime departure, int numAdults = 1)

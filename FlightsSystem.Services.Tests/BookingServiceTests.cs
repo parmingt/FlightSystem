@@ -14,6 +14,7 @@ using Data = FlightSystem.Data;
 using Microsoft.Extensions.Caching.Memory;
 using System.Data;
 using Microsoft.EntityFrameworkCore.Storage;
+using Testcontainers.PostgreSql;
 
 namespace FlightsSystem.Services.Tests;
 
@@ -23,11 +24,13 @@ public class BookingServiceTests
     private static ServiceProvider _serviceProvider;
 
     [ClassInitialize]
-    public static void Initialize(TestContext testContext)
+    public static async Task Initialize(TestContext testContext)
     {
         var serviceCollection = TestHelpers.BuildServiceCollection();
+        var postgreSqlContainer = new PostgreSqlBuilder("postgres:15.1").Build();
+        await postgreSqlContainer.StartAsync();
         serviceCollection.AddDbContext<FlightContext>((_, optionsBuilder) =>
-            optionsBuilder.UseNpgsql("Server=localhost;Port=5432;Database=Flights;User ID=postgres;password=postgres;timeout=1000")
+            optionsBuilder.UseNpgsql(postgreSqlContainer.GetConnectionString())
             , ServiceLifetime.Transient);
         serviceCollection.AddScoped<AirportsService>();
         serviceCollection.AddScoped<FlightSearchService>();
@@ -43,6 +46,11 @@ public class BookingServiceTests
 
         context.Seats.ExecuteDelete();
         context.Segments.ExecuteDelete();
+        context.Airports.AddRange([
+            new Data.Airport() { Code = "JFK", Name = "Kennedy" },
+            new Data.Airport() { Code = "LAX", Name = "Los Angeles" }
+            ]);
+        await context.SaveChangesAsync();
         context.Segments.Add(new Data.Segment()
         {
             Origin = context.Airports.First(a => a.Code == "JFK"),
@@ -53,7 +61,7 @@ public class BookingServiceTests
             Seats = [new Seat() { Version = 1 }]
         });
         context.Bookings.RemoveRange(context.Bookings);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
     [ClassCleanup]

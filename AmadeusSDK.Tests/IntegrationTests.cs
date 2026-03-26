@@ -40,8 +40,8 @@ public sealed class IntegrationTests
         var offers = new List<Offers> { flights.First() };
         var confirmation = await client.ConfirmFlightOffer(offers);
 
-        Assert.IsTrue(confirmation.Any());
-        Assert.IsTrue(flights.First().Price.Total == confirmation.First().Price.Total);
+        Assert.IsTrue(confirmation.Data.Any());
+        Assert.IsTrue(flights.First().Price.Total == confirmation.Data.First().Price.Total);
     }
 
     [TestMethod]
@@ -59,7 +59,7 @@ public sealed class IntegrationTests
         var confirmedOffer = await client.ConfirmFlightOffer([flights[2]]);
         var order = new FlightOrder()
         {
-            FlightOffers = new List<Offers> { confirmedOffer.First() },
+            FlightOffers = new List<Offers> { confirmedOffer.Data.First() },
             Travelers = new List<Traveler>()
             {
                 new Traveler()
