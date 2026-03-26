@@ -51,7 +51,7 @@ public class FlightContext : DbContext
         }
 
         modelBuilder.Entity<Seat>()
-            .Property(s => s.Version)
+            .Property(s => s.BookingId)
             .IsConcurrencyToken();
     }
 }
@@ -93,8 +93,8 @@ public class Seat
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     [Key]
     public Guid? Id { get; set; }
-    public int Version { get; set; }
     public Booking? Booking { get; set; }
+    public virtual Guid? BookingId { get; set; }
     public virtual Segment Segment { get; set; }
 }
 

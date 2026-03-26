@@ -53,7 +53,7 @@ public class BookingServiceTests
             CarrierCode = "AA",
             Number = "100",
             Departure = DateTime.UtcNow.AddDays(1),
-            Seats = [new Seat() { Version = 1 }]
+            Seats = [new Seat()]
         });
         context.Bookings.RemoveRange(context.Bookings);
         await context.SaveChangesAsync();
@@ -77,7 +77,7 @@ public class BookingServiceTests
         }
         catch (DbUpdateConcurrencyException) { }
 
-        var bookings = context.Bookings.Include(b => b.Price).ToList();
+        var bookings = context.Bookings.Include(b => b.Price).Include(b => b.Seats).ToList();
         Assert.AreEqual(1, bookings.Count);
         Assert.AreEqual("fake_booking_id", bookings.First().BookingId);
 
