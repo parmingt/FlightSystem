@@ -15,6 +15,7 @@ public class FlightContext : DbContext
     public DbSet<Booking> Bookings { get; set; }
     public DbSet<Currency> Currency { get; set; }
     public DbSet<BookingStatus> BookingStatus { get; set; }
+    public DbSet<Price> Price { get; set; }
 
     public FlightContext(DbContextOptions<FlightContext> options)
     : base(options)

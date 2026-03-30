@@ -31,13 +31,7 @@ public class BookingService
                 segment.CarrierCode == s.CarrierCode &&
                 segment.Number == s.Number &&
                 segment.Departure.Date == s.Departure.Date))
-            .Where(s => s is { Seats.Count: > 0 });
-
-        if (segments.Count() < selectedFlight.Segments.Count)
-        {
-            Console.WriteLine("Not enough seats available");
-            return null;
-        }   
+            .Where(s => s is { Seats.Count: >0 });
 
         var segmentsToCreate = selectedFlight.Segments
             .Where(s => !segments.Any(es =>
@@ -56,7 +50,7 @@ public class BookingService
                 {
                 }]
         }).ToList();
-        segmentsToCreate = [];
+
         context.Segments.AddRange(segmentsToCreate);
 
         var newBooking = new Data.Booking()
@@ -68,7 +62,7 @@ public class BookingService
             },
             Status = context.BookingStatus.First(s => s.Name == "Pending"),
             BookingDate = DateTime.UtcNow,
-            Seats = segments.Select(s => s.Seats.First(s => s.Booking == null)).ToList()
+            Seats = segments.Concat(segmentsToCreate).Select(s => s.Seats.First(s => s.Booking == null)).ToList()
         };
         context.Bookings.Add(newBooking);
         foreach (var seat in newBooking.Seats)
@@ -80,7 +74,10 @@ public class BookingService
         var bookingResult = await flightSearchService.BookFlight(selectedFlight);
 
         if (!bookingResult.Success)
+        {
+            context.Bookings.Remove(newBooking);
             return bookingResult.ErrorMessage;
+        }
 
         newBooking.BookingId = bookingResult.Data.BookingId;
         await context.SaveChangesAsync();
