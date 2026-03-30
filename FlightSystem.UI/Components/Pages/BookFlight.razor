@@ -150,10 +150,10 @@ else
 
     private async Task OnRowClick(GridRowEventArgs<FlightOffer> args)
     {
-        var message = await bookingService.BookFlight(args.Item);
-        if (message is not null)
+        var bookingResult = await bookingService.BookFlight(args.Item);
+        if (!bookingResult.Success)
         {
-            ShowMessage(ToastType.Danger, message);
+            ShowMessage(ToastType.Danger, bookingResult.ErrorMessage);
             return;
         };
         NavigationManager.NavigateTo("bookings");

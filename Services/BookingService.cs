@@ -14,14 +14,14 @@ public class BookingService
         this.context = context;
         this.flightSearchService = flightSearchService;
     }
-    public async Task<string?> BookFlight(FlightOffer selectedFlight)
+    public async Task<Result<string?>> BookFlight(FlightOffer selectedFlight)
     {
         var confirmed = await flightSearchService.ConfirmFlight(selectedFlight);
 
         if (!confirmed)
         {
             Console.WriteLine("outdated flight");
-            return "Outdated flight";
+            return new Failure("Outdated flight");
         }
 
         // Create segments in db
@@ -76,12 +76,12 @@ public class BookingService
         if (!bookingResult.Success)
         {
             context.Bookings.Remove(newBooking);
-            return bookingResult.ErrorMessage;
+            return new Failure(bookingResult.ErrorMessage);
         }
 
         newBooking.BookingId = bookingResult.Data.BookingId;
         await context.SaveChangesAsync();
-        return null;
+        return Result<string?>.SuccessResult(bookingResult.Data.BookingId);
     }
 
     public async Task<List<Models.BookedFlightSummary>> GetBookings()

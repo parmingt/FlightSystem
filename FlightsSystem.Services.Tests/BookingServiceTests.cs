@@ -70,8 +70,8 @@ public class BookingServiceTests
         var context = _serviceProvider.GetRequiredService<FlightContext>();
         try
         {
-            var task1 = Task.Run(bookLaxFlight);
-            var task2 = Task.Run(bookLaxFlight);
+            var task1 = Task.Run(BookLaxFlight);
+            var task2 = Task.Run(BookLaxFlight);
             await Task.WhenAll(task1, task2);
             Assert.Fail("Expected concurrency exception not thrown");
         }
@@ -80,23 +80,32 @@ public class BookingServiceTests
         var bookings = context.Bookings.Include(b => b.Price).Include(b => b.Seats).ToList();
         Assert.AreEqual(1, bookings.Count);
         Assert.AreEqual("fake_booking_id", bookings.First().BookingId);
+    }
 
-        async Task bookLaxFlight()
-        {
-            var service = _serviceProvider.GetRequiredService<BookingService>();
+    [TestMethod]
+    public async Task BookingReturnsBookingId()
+    {
+        var context = _serviceProvider.GetRequiredService<FlightContext>();
+        var result = await BookLaxFlight();
 
-            await service.BookFlight(new FlightOffer(
-                DateTime.UtcNow,
-                new Models.Price(300m, "USD", 300m),
-                [
-                    new Models.Segment("AA", "100"
+        Assert.AreEqual("fake_booking_id", result.Data);
+    }
+
+    private Task<Result<string?>> BookLaxFlight()
+    {
+        var service = _serviceProvider.GetRequiredService<BookingService>();
+
+        return service.BookFlight(new FlightOffer(
+            DateTime.UtcNow,
+            new Models.Price(300m, "USD", 300m),
+            [
+                new Models.Segment("AA", "100"
                         , new IataCode("JFK"), new IataCode("LAX"), DateTime.UtcNow.AddDays(1), "seg1")
-                ],
-                "",
-                [],
-                "",
-                []
-            ));
-        }
+            ],
+            "",
+            [],
+            "",
+            []
+        ));
     }
 }
