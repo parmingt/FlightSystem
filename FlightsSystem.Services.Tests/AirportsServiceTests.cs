@@ -16,9 +16,9 @@ using Testcontainers.PostgreSql;
 namespace FlightsSystem.Services.Tests;
 
 [TestClass]
+[DoNotParallelize]
 public class AirportsServiceTests
 {
-    private static SqliteConnection _connection;
     private static ServiceProvider _serviceProvider;
 
     [ClassInitialize]
@@ -36,14 +36,15 @@ public class AirportsServiceTests
         using var context = new FlightContext(dbContextOptions);
         context.Database.EnsureCreated();
         context.Airports.AddRange(new List<Airport> {
-            new Airport(){Code = "EWR", Name = "Newark" }
+            new Airport(){Code = "EWR", Name = "Newark" },
+            new Airport(){Code = "JFK", Name = "John F Kennedy" }
         });
         context.SaveChanges();
 
         var serviceCollection = TestHelpers.BuildServiceCollection();
         serviceCollection.AddDbContext<FlightContext>((_, optionsBuilder) =>
             optionsBuilder.UseNpgsql(postgreSqlContainer.GetConnectionString())
-            , ServiceLifetime.Transient);
+            , ServiceLifetime.Singleton);
         _serviceProvider = serviceCollection.BuildServiceProvider();
     }
 
@@ -53,10 +54,13 @@ public class AirportsServiceTests
     }
 
     [TestMethod]
-    public async Task GetAirport()
+    [DataRow("EWR", 1)]
+    [DataRow("new", 1)]
+    [DataRow("ph", 0)]
+    public async Task GetAirport(string query, int expectedCount)
     {
         var service = _serviceProvider.GetRequiredService<AirportsService>();
-        var airports = await service.SearchAirportsAsync("EWR");
-        Assert.IsTrue(airports.Count() == 1);
+        var airports = await service.SearchAirportsAsync(query);
+        Assert.IsTrue(airports.Count() == expectedCount);
     }
 }
