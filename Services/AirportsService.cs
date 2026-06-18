@@ -18,7 +18,8 @@ public class AirportsService
     public async Task<List<Airport>> SearchAirportsAsync(string query)
     {
         var data = context.Airports.Where(a =>
-            EF.Functions.Like(a.Code.ToLower(), $"%{query.ToLower()}%") || EF.Functions.Like(a.Name.ToLower(), $"%{query.ToLower()}%"));
+            a.SearchVector.Matches(EF.Functions.ToTsQuery($"'{query}':*"))
+        );
         return await data.Select(a => new Airport(new IataCode(a.Code), a.Name)).ToListAsync();
     }
 

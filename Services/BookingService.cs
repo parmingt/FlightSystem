@@ -86,7 +86,7 @@ public class BookingService
 
     public async Task<List<Models.BookedFlightSummary>> GetBookings()
     {
-        var bookings = await context.Bookings
+        var bookings = await context.Bookings.AsNoTracking()
             .Where(b => b.Seats.Any())
             .Include(b => b.Seats).ThenInclude(s => s.Segment).ThenInclude(s => s.Origin)
             .Include(b => b.Seats).ThenInclude(s => s.Segment).ThenInclude(s => s.Destination)

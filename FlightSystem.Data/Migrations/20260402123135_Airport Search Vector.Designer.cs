@@ -3,6 +3,7 @@ using System;
 using FlightSystem.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using NpgsqlTypes;
@@ -12,9 +13,11 @@ using NpgsqlTypes;
 namespace FlightSystem.Data.Migrations
 {
     [DbContext(typeof(FlightContext))]
-    partial class FlightContextModelSnapshot : ModelSnapshot
+    [Migration("20260402123135_Airport Search Vector")]
+    partial class AirportSearchVector
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -42,7 +45,7 @@ namespace FlightSystem.Data.Migrations
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("tsvector")
                         .HasAnnotation("Npgsql:TsVectorConfig", "english")
-                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Name", "Code" });
+                        .HasAnnotation("Npgsql:TsVectorProperties", new[] { "Name" });
 
                     b.HasKey("Id");
 
@@ -124,12 +127,12 @@ namespace FlightSystem.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("a9932ae4-7f36-449c-9e2f-8ac6ccdc4fa1"),
+                            Id = new Guid("73dc9844-a4a5-474a-b40d-0b12f59d3750"),
                             Name = "USD"
                         },
                         new
                         {
-                            Id = new Guid("0117a4c7-3c4e-429d-a1ec-9236977bc3e0"),
+                            Id = new Guid("bb83f166-c79c-4b61-b8cb-9312d56db87d"),
                             Name = "EUR"
                         });
                 });

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NpgsqlTypes;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -54,6 +55,15 @@ public class FlightContext : DbContext
         modelBuilder.Entity<Seat>()
             .Property(s => s.BookingId)
             .IsConcurrencyToken();
+
+        modelBuilder.Entity<Airport>()
+            .HasGeneratedTsVectorColumn(
+                p => p.SearchVector,
+                "english",
+                p => new { p.Name, p.Code }
+            )
+            .HasIndex(p => p.SearchVector)
+            .HasMethod("GIN");
     }
 }
 
@@ -65,6 +75,7 @@ public class Airport
     public Guid? Id { get; set; }
     public required string Code { get; set; }
     public required string Name { get; set; }
+    public NpgsqlTsVector SearchVector { get; set; } = null!;
 }
 
 public class Segment
